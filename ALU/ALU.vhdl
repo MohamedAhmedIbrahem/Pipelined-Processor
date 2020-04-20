@@ -42,6 +42,8 @@ BEGIN
 		CARRY := A(TO_INTEGER(UNSIGNED(B)) - 1);
 	ELSIF OP = "1011" THEN  -- LDM
 		RES := B;
+	ELSE 
+		RES := A;
 	END IF;
 	C <= RES;
 	IF RES = x"00000000" THEN
