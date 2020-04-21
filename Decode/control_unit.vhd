@@ -3,7 +3,7 @@ USE IEEE.std_logic_1164.ALL;
 
 ENTITY control_unit IS
     PORT (
-        opcode : IN std_logic_vector(4 DOWNTO 0);
+        opcode : IN std_logic_vector(0 TO 4);
         alu_input : OUT std_logic_vector(3 DOWNTO 0);
         wb1 : OUT std_logic;
         wb2 : OUT std_logic;
@@ -18,11 +18,11 @@ ENTITY control_unit IS
         sp : OUT std_logic;
         swap : OUT std_logic;
         jz : OUT std_logic;
-        mu0_1_selectors : OUT std_logic_vector(1 DOWNTO 0);
-        mu0_4_selectors : OUT std_logic_vector(1 DOWNTO 0);
-        mu0_5_selectors : OUT std_logic;
-        mu0_7_selectors : OUT std_logic;
-        mu0_8_selectors : OUT std_logic
+        mux_1_selectors : OUT std_logic_vector(1 DOWNTO 0);
+        mux_4_selectors : OUT std_logic_vector(1 DOWNTO 0);
+        mux_5_selectors : OUT std_logic;
+        mux_7_selectors : OUT std_logic;
+        mux_8_selectors : OUT std_logic
     );
 END control_unit;
 
@@ -74,10 +74,10 @@ BEGIN
     swap <= control_signals(8);
     wb2 <= control_signals(8);
     jz <= control_signals(7);
-    mu0_1_selectors <= control_signals(6 DOWNTO 5);
-    mu0_4_selectors <= control_signals(4 DOWNTO 3);
-    mu0_5_selectors <= control_signals(2);
-    mu0_7_selectors <= control_signals(1);
-    mu0_8_selectors <= control_signals(0);
+    mux_1_selectors <= control_signals(6 DOWNTO 5);
+    mux_4_selectors <= control_signals(4 DOWNTO 3);
+    mux_5_selectors <= control_signals(2);
+    mux_7_selectors <= control_signals(1);
+    mux_8_selectors <= control_signals(0);
 
 END control_unit_operation;
