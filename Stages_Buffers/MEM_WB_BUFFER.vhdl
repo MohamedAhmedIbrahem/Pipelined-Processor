@@ -4,10 +4,10 @@ USE IEEE.STD_LOGIC_1164.ALL;
 ENTITY MEM_WB_BUFFER IS
     PORT(
 		CLK, RST, EN                            : IN   STD_LOGIC					 ;
-        Op2,Op1                                 : IN   STD_LOGIC_VECTOR(31 DOWNTO 0) ;    -- operands
+        Op1,Op2                                 : IN   STD_LOGIC_VECTOR(31 DOWNTO 0) ;    -- operands
         DST1,DST2                             	: IN   STD_LOGIC_VECTOR(2 DOWNTO 0)  ;    -- Registers' Adresses
         WB1,WB2,PCWB,FLAGSWB  					: IN   STD_LOGIC					 ;    -- Signals
-        Op2_WB,Op1_WB                           : OUT  STD_LOGIC_VECTOR(31 DOWNTO 0) ;    -- operands
+        Op1_WB,Op2_WB                           : OUT  STD_LOGIC_VECTOR(31 DOWNTO 0) ;    -- operands
         DST1_WB,DST2_WB                         : OUT  STD_LOGIC_VECTOR(2 DOWNTO 0)	 ;    -- Registers' Adresses
         WB1_WB,WB2_WB,PCWB_WB,FLAGSWB_WB  		: OUT  STD_LOGIC					      -- Signals
     );
