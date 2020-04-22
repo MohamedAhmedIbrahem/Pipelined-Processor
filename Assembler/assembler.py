@@ -79,11 +79,11 @@ class Assembler():
                         ir += self.registers[words[i]]
                     ir += ('0' * (16-len(ir)))
                     print("GroupA",ir,len(ir))
-                    return ir,1,False
+                    return ir,1
                 elif words[0] in self.groupB.keys():    #shift
                     ir = "00" + self.groupB[words[0]] + self.registers[words[1]] + bin(int(words[2])).replace("0b","").zfill(5) + "0"
                     print("GroupB",ir,len(ir))
-                    return ir,1,False
+                    return ir,1
                 elif words[0] in self.groupC.keys():    #immediate
                     if words[0] in self.TwoOperand:     #ldm
                         immediate_value = bin(int(words[2])).replace("0b","").zfill(16)
@@ -92,15 +92,15 @@ class Assembler():
                         immediate_value = bin(int(words[3])).replace("0b","").zfill(16)
                         ir ="01" + self.groupC[words[0]] + self.registers[words[1]] + self.registers[words[2]] + "00" + immediate_value[0] + "1" + immediate_value[1:]
                     print("GroupC",ir,len(ir))
-                    return ir,2,False   
+                    return ir,2
                 elif words[0] in self.groupD.keys():    #memory
                     effective_address = bin(int(words[2])).replace("0b","").zfill(20)
                     ir = "01" + self.groupD[words[0]] + self.registers[words[1]] + "0" + effective_address[:5] + "1" + effective_address[5:]
                     print("GroupD",ir,len(ir))
-                    return ir,2,(words[0]=="ldd")
+                    return ir,2
             except:
                 print("Invalid instruction Format!")
-        return '0'*16,0,False
+        return '0'*16,0
     def __read_code_file(self):
 
         with open(self.path) as FILE:
@@ -132,7 +132,7 @@ class Assembler():
                 self.current_code_mem_location += 1
                 continue
 
-            ir, size,isLoad = self.__get_instruction_info(line)
+            ir, size = self.__get_instruction_info(line)
 
             if size == 0:
                 print("invalid instruction !")
@@ -140,12 +140,8 @@ class Assembler():
             elif size == 1 and len(ir)==16:
                 self.binary_code[self.current_code_mem_location] = ir
             elif size == 2 and len(ir)==32:
-                if isLoad:
-                    self.binary_code[self.current_code_mem_location+1] = ir[:16]
                     self.binary_code[self.current_code_mem_location]   = ir[16:]
-                else:
-                    self.binary_code[self.current_code_mem_location]   = ir[:16]
-                    self.binary_code[self.current_code_mem_location+1] = ir[16:]
+                    self.binary_code[self.current_code_mem_location+1] = ir[:16]
             else:
                 print("Large immediate value!")
                 return
