@@ -23,7 +23,7 @@ END ENTITY;
 
 ARCHITECTURE Fetch_Forwarding_Unit_Arch OF Fetch_Forwarding_Unit IS
 BEGIN
-	PROCESS 
+	PROCESS (ALL)
 	BEGIN
 		IF (RST = '1') THEN
 			Fetch_Forwarding_Enable <= '0';
