@@ -1,0 +1,15 @@
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+
+ENTITY IR_LOW IS
+    PORT(
+        CLK, RST, EN    : IN  STD_LOGIC;
+        Din             : IN  STD_LOGIC_VECTOR(0 TO 15);
+        Dout            : OUT STD_LOGIC_VECTOR(0 TO 15)
+    );
+END ENTITY;
+
+ARCHITECTURE arch OF IR_LOW IS
+BEGIN
+    REG : ENTITY work.RISING_EDGE_REG GENERIC MAP (16) PORT MAP (CLK => CLK , RST => RST , EN => EN , Din => Din , Dout => Dout);
+END ARCHITECTURE;

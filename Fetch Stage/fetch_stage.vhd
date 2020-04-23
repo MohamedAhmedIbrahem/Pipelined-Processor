@@ -12,7 +12,7 @@ ENTITY fetch_stage IS
         jmp_register, pc_write_back_data : IN std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
         predicted_taken: OUT std_logic;
         prediction_cache_key: OUT std_logic_vector(PREDICTION_CACHE_KEY_SIZE-1 DOWNTO 0);
-        ir_low, ir_high: OUT std_logic_vector(0 TO INSTRUCTION_WORD_SIZE-1)
+        ir_fetch : OUT std_logic_vector(0 TO INSTRUCTION_WORD_SIZE-1)
     );
 END;
 
@@ -32,7 +32,7 @@ ARCHITECTURE fetch_stage_arch OF fetch_stage IS
         std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
     SIGNAL is_int_internal, is_jz, is_jmp, false_prediction: std_logic;
     SIGNAL pc_incremented : std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
-    SIGNAL ir_fetch: std_logic_vector(0 TO INSTRUCTION_WORD_SIZE-1);
+    
 BEGIN
     -- Temporary until dynamic branch prediction and interrupt controller are implemented
     predicted_taken <= '1';
@@ -53,8 +53,8 @@ BEGIN
 
     is_jz <= '1' WHEN ir_fetch(2 TO 6) = JZ_OP_CODE ELSE '0';
 
-    ir_high <= ir_fetch WHEN ir_fetch(0) = '0' ELSE (OTHERS => '0');
-    ir_low <= ir_fetch WHEN ir_fetch(0) = '1' ELSE (OTHERS => '0');
+    --ir_high <= ir_fetch WHEN ir_fetch(0) = '0' ELSE (OTHERS => '0');
+    --ir_low <= ir_fetch WHEN ir_fetch(0) = '1' ELSE (OTHERS => '0');
 
     pc : ENTITY work.RISING_EDGE_REG GENERIC MAP (SIZE => ADDRESS_SIZE)
         PORT MAP(clk, rst, pc_enable, pc_in, pc_out);

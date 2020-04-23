@@ -8,7 +8,7 @@ ENTITY DATA_RAM IS
         CLK             : IN  STD_LOGIC;
         WR              : IN  STD_LOGIC;
         RD              : IN  STD_LOGIC;
-		RST				: IN  STD_LOGIC;
+	RST		: IN  STD_LOGIC;
         Address         : IN  STD_LOGIC_VECTOR(AddressWidth-1 DOWNTO 0);
         Din             : IN  STD_LOGIC_VECTOR(2*CellSize-1 DOWNTO 0);
         Dout            : OUT STD_LOGIC_VECTOR(2*CellSize-1 DOWNTO 0)
@@ -16,8 +16,7 @@ ENTITY DATA_RAM IS
 END ENTITY;
 
 ARCHITECTURE arch_DATA_RAM OF DATA_RAM IS
-    CONSTANT MEMORY_SIZE: integer := 1000;
-    TYPE memory IS ARRAY(0 TO MEMORY_SIZE-1) OF STD_LOGIC_VECTOR(CellSize-1 DOWNTO 0);
+    TYPE memory IS ARRAY(0 TO (2**AddressWidth)-1) OF STD_LOGIC_VECTOR(CellSize-1 DOWNTO 0);
     SIGNAL Mem : memory := (OTHERS => "0000000000000000");
 BEGIN
     PROCESS(CLK,RST)

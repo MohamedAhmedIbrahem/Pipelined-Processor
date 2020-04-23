@@ -6,7 +6,7 @@ USE IEEE.STD_LOGIC_SIGNED.ALL;
 ENTITY Fetch_Forwarding_Unit IS
 	PORT (
 		CLK, RST 					: IN STD_LOGIC;
-		JZ_Fetch, JMP_Fetch, CALL_Fetch 		: IN STD_LOGIC; 			-- Fetch Stage Signals
+		JZ_Fetch, JMP_Fetch		 		: IN STD_LOGIC; 			-- Fetch Stage Signals
 		SRC1_Fetch					: IN STD_LOGIC_VECTOR(2 DOWNTO 0);      -- Fetch Stage SRC Address IR_Fetch[7:9]
 		WB1_DEC, WB2_DEC				: IN STD_LOGIC; 			-- Decode Stage Signals
 		DST1_DEC, DST2_DEC 				: IN STD_LOGIC_VECTOR(2 DOWNTO 0); 	-- Decode Stage DST Addresses IR[7:9], IR[10:12]
@@ -30,7 +30,7 @@ BEGIN
 			Op_Fetch_Forwarded <= (OTHERS => '0');
 			Fetch_Forwarding_Stall <= '0';
 		ELSE
-			IF (JZ_Fetch = '1' OR JMP_Fetch = '1' OR CALL_Fetch = '1') THEN       -- Instruction that Changes PC
+			IF (JZ_Fetch = '1' OR JMP_Fetch = '1') THEN       -- Instruction that Changes PC
 				IF (((WB1_DEC = '1') AND (SRC1_Fetch = DST1_DEC)) OR	       -- Decode Stage
 				    ((WB2_DEC = '1') AND (SRC1_Fetch = DST2_DEC)))   THEN 
 					Fetch_Forwarding_Stall <= '1';

@@ -15,9 +15,9 @@ BEGIN
     PROCESS(CLK, RST)
     BEGIN
         IF RISING_EDGE(CLK) THEN
-            IF RST='1' THEN
+            IF RST ='1' THEN
                 Dout <= (OTHERS => '0');
-            ELSIF EN='1' THEN
+            ELSIF EN ='1' THEN
                 Dout <= Din;
             END IF;
         END IF;
