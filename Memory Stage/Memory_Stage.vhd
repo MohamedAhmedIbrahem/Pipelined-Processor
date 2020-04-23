@@ -7,11 +7,11 @@ ENTITY Memory_Stage IS
 	PORT (
 		CLK, RST 						: IN STD_LOGIC;
 		Op1_MEM, Op2_MEM                                  	: IN STD_LOGIC_VECTOR(31 DOWNTO 0);     -- operands
-        	DST1_MEM, DST2_MEM              			: IN STD_LOGIC_VECTOR(2 DOWNTO 0) ;     -- Registers' Adresses
+        	DST1_MEM, DST2_MEM              			: IN STD_LOGIC_VECTOR(0 TO 2);	        -- Registers' Adresses
         	WB1_MEM, WB2_MEM, WR_MEM, RD_MEM, I_O_MEM,
 		PCWB_MEM, FLAGSWB_MEM 					: IN STD_LOGIC;
         	Op1_MEM_OUT, Op2_MEM_OUT                  		: OUT STD_LOGIC_VECTOR(31 DOWNTO 0);    -- operands
-       	 	DST1_MEM_OUT, DST2_MEM_OUT                		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);     -- Registers' Adresses
+       	 	DST1_MEM_OUT, DST2_MEM_OUT                		: OUT STD_LOGIC_VECTOR(0 TO 2);	        -- Registers' Adresses
         	WB1_MEM_OUT, WB2_MEM_OUT, 
 		PCWB_MEM_OUT, FLAGSWB_MEM_OUT  				: OUT STD_LOGIC;                        -- Signals
 		Output_Port						: OUT STD_LOGIC_VECTOR(31 DOWNTO 0)

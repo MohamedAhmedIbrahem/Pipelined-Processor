@@ -8,18 +8,18 @@ ENTITY Execute_Stage IS
 		CLK, RST 						: IN STD_LOGIC;
 		Op1_EX, Op2_EX                                  	: IN STD_LOGIC_VECTOR(31 DOWNTO 0);     -- operands
         	ALU_Op_EX                                       	: IN STD_LOGIC_VECTOR(3 DOWNTO 0) ;     -- ALU operation
-        	SRC1_EX, SRC2_EX, DST1_EX, DST2_EX              	: IN STD_LOGIC_VECTOR(2 DOWNTO 0) ;     -- Registers' Adresses
+        	SRC1_EX, SRC2_EX, DST1_EX, DST2_EX              	: IN STD_LOGIC_VECTOR(0 TO 2);	        -- Registers' Adresses
         	WB1_EX, WB2_EX, WR_EX, RD_EX, I_O_EX, PCWB_EX, 
 		FLAGSWB_EX, FLAGS_UPD_EX, IS_SRC1_EX, IS_SRC2_EX  	: IN STD_LOGIC;  			-- Signals 
 		WB1_MEM, WB2_MEM, RD_MEM, I_O_MEM 			: IN STD_LOGIC; 			-- Memory Stage Signals
-		DST1_MEM, DST2_MEM 					: IN STD_LOGIC_VECTOR(2 DOWNTO 0); 	-- Memory Stage DST Addresses
+		DST1_MEM, DST2_MEM 					: IN STD_LOGIC_VECTOR(0 TO 2);	 	-- Memory Stage DST Addresses
 		Op1_MEM, Op2_MEM 					: IN STD_LOGIC_VECTOR(31 DOWNTO 0);	-- Memory Stage DST Registers
 		WB1_WB, WB2_WB, FLAGSWB_WB	 			: IN STD_LOGIC; 			-- Write Back Stage Signals
-		DST1_WB, DST2_WB 					: IN STD_LOGIC_VECTOR(2 DOWNTO 0); 	-- Write Back Stage DST Addresses
+		DST1_WB, DST2_WB 					: IN STD_LOGIC_VECTOR(0 TO 2);	 	-- Write Back Stage DST Addresses
 		Op1_WB, Op2_WB						: IN STD_LOGIC_VECTOR(31 DOWNTO 0); 	-- Write Back Stage DST Registers
 		Input_Port                              		: IN STD_LOGIC_VECTOR(31 DOWNTO 0);
         	Op1_EX_OUT, Op2_EX_OUT                  		: OUT STD_LOGIC_VECTOR(31 DOWNTO 0);    -- operands
-       	 	DST1_EX_OUT, DST2_EX_OUT                		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);     -- Registers' Adresses
+       	 	DST1_EX_OUT, DST2_EX_OUT                		: OUT STD_LOGIC_VECTOR(0 TO 2);		-- Registers' Adresses
         	WB1_EX_OUT, WB2_EX_OUT, WR_EX_OUT, 
 		RD_EX_OUT, I_O_EX_OUT, PCWB_EX_OUT, FLAGSWB_EX_OUT  	: OUT STD_LOGIC;                        -- Signals
 		EX_Forwarding_Stall					: OUT STD_LOGIC; 
@@ -41,7 +41,7 @@ ARCHITECTURE Execute_Stage_Arch OF Execute_Stage IS
 	SIGNAL FLAGSWB_WB_TMP, FLAGS_REG_EN_TMP, MEM_Op1_MUX_Enable : STD_LOGIC_VECTOR(0 DOWNTO 0);
 BEGIN
   	
-	EX_FORW_UNIT : ENTITY work.Execute_Forwarding_Unit PORT MAP (CLK, RST, IS_SRC1_EX, IS_SRC2_EX, SRC1_EX, SRC2_EX, WB1_MEM, WB2_MEM, RD_MEM, I_O_MEM, 	
+	EX_FORW_UNIT : ENTITY work.Execute_Forwarding_Unit PORT MAP (RST, IS_SRC1_EX, IS_SRC2_EX, SRC1_EX, SRC2_EX, WB1_MEM, WB2_MEM, RD_MEM, I_O_MEM, 	
 			DST1_MEM, DST2_MEM, Op1_MEM, Op2_MEM, WB1_WB, WB2_WB, DST1_WB, DST2_WB, Op1_WB, Op2_WB, Op1_Forwarding_Enable(0),
 			Op2_Forwarding_Enable(0), Forwarding_Stall(0), Op1_Forwarded, Op2_Forwarded); 	
 
