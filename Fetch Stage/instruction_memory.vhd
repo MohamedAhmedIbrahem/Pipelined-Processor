@@ -1,7 +1,6 @@
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.all;
 USE IEEE.NUMERIC_STD.all;
-USE WORK.bus_array_pkg.all;
 
 
 ENTITY instruction_memory IS
