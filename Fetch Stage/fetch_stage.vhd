@@ -16,10 +16,11 @@ ENTITY fetch_stage IS
         WB1_DEC, WB2_DEC, WB1_EX, WB2_EX, WB1_MEM, WB2_MEM, RD_MEM, I_O_MEM : IN std_logic;
         DST1_DEC, DST2_DEC, DST1_EX, DST2_EX, DST1_MEM, DST2_MEM : IN std_logic_vector(0 TO 2);
         Op1_MEM, Op2_MEM : IN std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
-        Fetch_Forwarding_Enable, Fetch_Forwarding_Stall: OUT std_logic;
+        Fetch_Forwarding_Stall: OUT std_logic;
         -- Forwarding unit signals END
         predicted_taken, false_prediction: OUT std_logic;
         prediction_cache_key: OUT std_logic_vector(PREDICTION_CACHE_KEY_SIZE-1 DOWNTO 0);
+	pc_transparent_out: OUT std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
         ir_fetch : OUT std_logic_vector(0 TO INSTRUCTION_WORD_SIZE-1)
     );
 END;
@@ -30,9 +31,9 @@ ARCHITECTURE fetch_stage_arch OF fetch_stage IS
     CONSTANT RST_ADDRESS: std_logic_vector := std_logic_vector(to_unsigned(499, ADDRESS_SIZE));
     CONSTANT RTI2_ADDRESS: std_logic_vector := std_logic_vector(to_unsigned(498, ADDRESS_SIZE));
 
-    SIGNAL pc_in, pc_out, pc_transparent_in, pc_transparent_out, forwarded_jmp_value, jmp_register: 
+    SIGNAL pc_in, pc_out, pc_transparent_in, forwarded_jmp_value, jmp_register: 
         std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
-    SIGNAL int_internal, jz_fetch, jmp_fetch, is_two_word, is_int_executing: std_logic;
+    SIGNAL int_internal, jz_fetch, jmp_fetch, is_two_word, is_int_executing, Fetch_Forwarding_Enable: std_logic;
     SIGNAL pc_incremented : std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
     SIGNAL op_code: std_logic_vector(0 TO 4);
 BEGIN

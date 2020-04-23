@@ -23,7 +23,7 @@ END ENTITY;
 
 ARCHITECTURE Execute_Forwarding_Unit_Arch OF Execute_Forwarding_Unit IS
 BEGIN
-	PROCESS 
+	PROCESS (ALL)
 	BEGIN
 		IF (RST = '1') THEN
 			Op1_EX_Forwarding_Enable <= '0';
