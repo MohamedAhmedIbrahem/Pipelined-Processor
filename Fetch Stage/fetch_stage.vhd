@@ -8,7 +8,8 @@ ENTITY fetch_stage IS
             PREDICTION_CACHE_KEY_SIZE: integer := 4
     );
     PORT (
-        clk, rst, pc_enable, is_rst, is_int, pc_write_back, jz_decode, z_forwarded: IN std_logic;
+        clk, rst, pc_enable, rst_external, int_external, pc_write_back, 
+        jz_decode, z_forwarded, bubble_pc_write_back: IN std_logic;
         jmp_register, pc_write_back_data : IN std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
         prediction_cache_key_decode: IN std_logic_vector(PREDICTION_CACHE_KEY_SIZE-1 DOWNTO 0);
         predicted_taken: OUT std_logic;
@@ -25,23 +26,26 @@ ARCHITECTURE fetch_stage_arch OF fetch_stage IS
 
     SIGNAL pc_in, pc_out, pc_transparent_in, pc_transparent_out: 
         std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
-    SIGNAL is_int_internal, is_jz, is_jmp, false_prediction: std_logic;
+    SIGNAL int_internal, jz_fetch, jmp_fetch, false_prediction, is_two_word, is_int_executing: std_logic;
     SIGNAL pc_incremented : std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
     SIGNAL op_code: std_logic_vector(0 TO 4);
 BEGIN
-    -- Temporary until dynamic branch prediction and interrupt controller are implemented
-    is_int_internal <= '0';
-
-    pc_transparent_in <= jmp_register WHEN (is_jz = '1' and predicted_taken = '0') 
+    pc_transparent_in <= jmp_register WHEN (jz_fetch = '1' and predicted_taken = '0') 
                                       ELSE pc_incremented;
 
     pc_incremented <= std_logic_vector(unsigned(pc_out) + 1);
 
     op_code <= ir_fetch(2 TO 6);
 
-    branch_decoder: ENTITY work.branch_decoder PORT MAP (op_code, is_jmp, is_jz);   
+    branch_decoder: ENTITY work.branch_decoder PORT MAP (op_code, jmp_fetch, jz_fetch);   
     
     prediction_cache_key <= pc_out(PREDICTION_CACHE_KEY_SIZE-1 DOWNTO 0);
+
+    is_two_word <= ir_fetch(0);
+
+    is_int_executing <= '1' WHEN pc_out = INT1_ADDRESS 
+                              or pc_out = std_logic_vector(unsigned(INT1_ADDRESS) + 1)
+                            ELSE '0';
 
     pc : ENTITY work.RISING_EDGE_REG GENERIC MAP (SIZE => ADDRESS_SIZE)
         PORT MAP(clk, rst, pc_enable, pc_in, pc_out);
@@ -53,18 +57,23 @@ BEGIN
     pc_transparent : ENTITY work.RISING_EDGE_REG GENERIC MAP (SIZE => ADDRESS_SIZE)
         PORT MAP(clk, rst, '1', pc_transparent_in, pc_transparent_out);
 
-    pc_controller: ENTITY work.pc_controller GENERIC MAP(ADDRESS_SIZE => ADDRESS_SIZE)
+    pc_controller : ENTITY work.pc_controller GENERIC MAP(ADDRESS_SIZE => ADDRESS_SIZE)
         PORT MAP(
-            is_int_internal, pc_write_back, is_rst, is_jz, is_jmp, predicted_taken, 
+            int_internal, pc_write_back, rst_external, jz_fetch, jmp_fetch, predicted_taken, 
             false_prediction, pc_incremented, INT1_ADDRESS, RST_ADDRESS, jmp_register,
             pc_write_back_data, pc_transparent_out, pc_in
         );
 
-    branch_predictor: ENTITY work.branch_predictor
+    branch_predictor : ENTITY work.branch_predictor
         GENERIC MAP(PREDICTION_CACHE_KEY_SIZE => PREDICTION_CACHE_KEY_SIZE)
         PORT MAP(
             clk, rst, jz_decode, z_forwarded, prediction_cache_key, prediction_cache_key_decode,
             predicted_taken, false_prediction
         );
 
+    interrupt_controller : ENTITY work.interrupt_controller
+        PORT MAP(
+            clk, rst, int_external, jmp_fetch, jz_fetch, jz_decode, is_int_executing, 
+            bubble_pc_write_back, is_two_word, int_internal
+        );
 END;
