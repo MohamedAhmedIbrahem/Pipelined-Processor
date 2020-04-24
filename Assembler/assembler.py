@@ -148,8 +148,9 @@ class Assembler():
             self.current_code_mem_location += size
 
     def __save_instructions(self):
+        mx = max(self.binary_code.keys())
         with open(self.code_output_path, "w") as f:
-            for address in range(self.number_of_lines):
+            for address in range(mx + 1):
                 if address in self.binary_code.keys():
                     f.write(self.binary_code[address]+"\n")
                 else:
@@ -157,6 +158,6 @@ class Assembler():
 
 if __name__ == '__main__':
     code_file_path = 'code.txt'
-    code_ram_file_path = 'CODE_RAM.txt'
+    code_ram_file_path = '../CODE_RAM.txt'
     a = Assembler(code_file_path, code_ram_file_path)
     a.parse()
