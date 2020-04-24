@@ -8,7 +8,7 @@ ENTITY fetch_stage IS
             PREDICTION_CACHE_KEY_SIZE: integer := 4
     );
     PORT (
-        clk, rst, pc_enable, int_external, pc_write_back, 
+        clk, rst, pc_enable, int_external, pc_write_back, predicted_taken_decode,
         jz_decode, z_forwarded, bubble_pc_write_back: IN std_logic;
         register_read_port3, pc_write_back_data : IN std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
         prediction_cache_key_decode: IN std_logic_vector(PREDICTION_CACHE_KEY_SIZE-1 DOWNTO 0);
@@ -75,8 +75,8 @@ BEGIN
     branch_predictor : ENTITY work.branch_predictor
         GENERIC MAP(PREDICTION_CACHE_KEY_SIZE => PREDICTION_CACHE_KEY_SIZE)
         PORT MAP(
-            clk, rst, jz_decode, z_forwarded, prediction_cache_key, prediction_cache_key_decode,
-            predicted_taken, false_prediction
+            clk, rst, jz_decode, z_forwarded, predicted_taken_decode, prediction_cache_key, 
+            prediction_cache_key_decode, predicted_taken, false_prediction
         );
 
     interrupt_controller : ENTITY work.interrupt_controller
