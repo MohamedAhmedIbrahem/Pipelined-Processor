@@ -43,7 +43,7 @@ BEGIN
   	
 	EX_FORW_UNIT : ENTITY work.Execute_Forwarding_Unit PORT MAP (RST, IS_SRC1_EX, IS_SRC2_EX, SRC1_EX, SRC2_EX, WB1_MEM, WB2_MEM, RD_MEM, I_O_MEM, 	
 			DST1_MEM, DST2_MEM, Op1_MEM, Op2_MEM, WB1_WB, WB2_WB, DST1_WB, DST2_WB, Op1_WB, Op2_WB, Op1_Forwarding_Enable(0),
-			Op2_Forwarding_Enable(0), Forwarding_Stall(0), Op1_Forwarded, Op2_Forwarded); 	
+			Op2_Forwarding_Enable(0), EX_Forwarding_Stall, Op1_Forwarded, Op2_Forwarded); 	
 
 	ALU_Op1_MUX_Input(0) <= Op1_EX;
 	ALU_Op1_MUX_Input(1) <= Op1_Forwarded;
