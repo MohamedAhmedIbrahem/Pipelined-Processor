@@ -8,7 +8,7 @@ ENTITY fetch_stage IS
             PREDICTION_CACHE_KEY_SIZE: integer := 4
     );
     PORT (
-        clk, rst, pc_enable, rst_external, int_external, pc_write_back, 
+        clk, rst, pc_enable, int_external, pc_write_back, 
         jz_decode, z_forwarded, bubble_pc_write_back: IN std_logic;
         register_read_port3, pc_write_back_data : IN std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
         prediction_cache_key_decode: IN std_logic_vector(PREDICTION_CACHE_KEY_SIZE-1 DOWNTO 0);
@@ -56,7 +56,7 @@ BEGIN
     jmp_register <= forwarded_jmp_value WHEN Fetch_Forwarding_Enable = '1' ELSE register_read_port3;
 
     pc : ENTITY work.RISING_EDGE_REG GENERIC MAP (SIZE => ADDRESS_SIZE)
-        PORT MAP(clk, rst, pc_enable, pc_in, pc_out);
+        PORT MAP(clk, '0', pc_enable, pc_in, pc_out);
 
     instruction_memory : ENTITY work.instruction_memory 
         GENERIC MAP (WORD_SIZE => INSTRUCTION_WORD_SIZE, ADDRESS_SIZE => ADDRESS_SIZE)
@@ -67,7 +67,7 @@ BEGIN
 
     pc_controller : ENTITY work.pc_controller GENERIC MAP(ADDRESS_SIZE => ADDRESS_SIZE)
         PORT MAP(
-            int_internal, pc_write_back, rst_external, jz_fetch, jmp_fetch, predicted_taken, 
+            int_internal, pc_write_back, rst, jz_fetch, jmp_fetch, predicted_taken, 
             false_prediction, pc_incremented, INT1_ADDRESS, RST_ADDRESS, jmp_register,
             pc_write_back_data, pc_transparent_out, pc_in
         );

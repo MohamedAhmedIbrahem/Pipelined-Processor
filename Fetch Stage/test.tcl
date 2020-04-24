@@ -10,7 +10,6 @@ set NumericStdNoWarnings 0; list
 force clk 1 0, 0 50 -r 100
 force rst 1
 force pc_enable 1
-force rst_external 0
 force int_external 0
 force pc_write_back 0
 force jz_decode 0
