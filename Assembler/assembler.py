@@ -99,8 +99,10 @@ class Assembler():
                     #print("GroupD",ir,len(ir))
                     return ir,2
             except:
+                pass
                 #print("Invalid instruction Format!")
-        return '0'*16,0
+            return '0'*16,0
+        
     def __read_code_file(self):
 
         with open(self.path) as FILE:
@@ -157,7 +159,7 @@ class Assembler():
                     f.write('0'*16 + "\n")
 
 if __name__ == '__main__':
-    code_file_path = 'assembler/code.txt'
-    code_ram_file_path = './CODE_RAM.txt'
+    code_file_path = 'Code.txt'
+    code_ram_file_path = 'assembler/CODE_RAM.txt'
     a = Assembler(code_file_path, code_ram_file_path)
     a.parse()
