@@ -160,6 +160,6 @@ class Assembler():
 
 if __name__ == '__main__':
     code_file_path = 'Code.txt'
-    code_ram_file_path = 'assembler/CODE_RAM.txt'
+    code_ram_file_path = 'CODE_RAM.txt'
     a = Assembler(code_file_path, code_ram_file_path)
     a.parse()
