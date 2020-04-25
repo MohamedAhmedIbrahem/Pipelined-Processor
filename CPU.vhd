@@ -60,7 +60,7 @@ BEGIN
 PCWB_Stall <= PCWB_DEC_OUT OR PCWB_EX_IN OR PCWB_MEM_IN OR PCWB_WB;
 
 ---------------------------------------------- Fetch Stage ----------------------------------------------------------
-Fetch_Stage : ENTITY work.Fetch_Stage GENERIC MAP (16, 32, 4) PORT MAP (CLK, RST, (Fetch_Forwarding_Stall OR PCWB_Stall OR EX_Forwarding_Stall),
+Fetch_Stage : ENTITY work.Fetch_Stage GENERIC MAP (16, 32, 4) PORT MAP (CLK, RST, NOT (Fetch_Forwarding_Stall OR PCWB_Stall OR EX_Forwarding_Stall),
 								       INT, PCWB_WB, P_TAKEN_DEC_IN, JZ_DEC_OUT, Flags(0), PCWB_Stall,
 								       Port3_DEC_OUT, Op1_WB, PC_KEY_DEC_IN, WB1_DEC_OUT, WB2_DEC_OUT,
 								       WB1_EX_IN, WB2_EX_IN, WB1_MEM_IN, WB2_MEM_IN, RD_MEM_IN, I_O_MEM_IN,
@@ -72,7 +72,7 @@ Fetch_Stage : ENTITY work.Fetch_Stage GENERIC MAP (16, 32, 4) PORT MAP (CLK, RST
 FETCH_DC_BUFFER : ENTITY work.FETCH_DC_BUFFER PORT MAP (CLK, RST OR (Fetch_Forwarding_Stall OR PCWB_Stall OR False_Prediction_FETCH), 
 					               (NOT EX_Forwarding_Stall), (EX_Forwarding_Stall NOR ((NOT IR_FETCH(0)) AND IR_FETCH(1))),  
         				  	       P_TAKEN_FETCH, P_TAKEN_DEC_IN, PC_KEY_FETCH, PC_KEY_DEC_IN,
-	    				               IR_FETCH, IR_HIGH_DEC_IN, IR_HIGH_DEC_IN);
+	    				               IR_FETCH, IR_HIGH_DEC_IN, IR_LOW_DEC_IN);
 
 ---------------------------------------------- Decode Stage -------------------------------------------------------------
 Decode_Stage : ENTITY work.Decode_Stage PORT MAP (CLK, RST, IR_HIGH_DEC_IN, IR_LOW_DEC_IN, (NOT EX_Forwarding_Stall),  
