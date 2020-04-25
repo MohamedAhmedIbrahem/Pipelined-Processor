@@ -40,7 +40,7 @@ force CLK 1 0, 0 50 -r 100
 force RST 1
 force INT 0
 force Input_Port 2#0
-run 200
+run 100
 force RST 0
 
 mem load -filldata $ram_contents $ram_sim_path -endaddress $end_address

@@ -57,8 +57,8 @@ BEGIN
 
     jmp_register <= forwarded_jmp_value WHEN Fetch_Forwarding_Enable = '1' ELSE register_read_port3;
 
-    pc : ENTITY work.RISING_EDGE_REG GENERIC MAP (SIZE => ADDRESS_SIZE)
-        PORT MAP(clk, '0', pc_enable, pc_in, pc_out);
+    pc : ENTITY work.pc_register GENERIC MAP (ADDRESS_SIZE => ADDRESS_SIZE)
+        PORT MAP(clk, rst, pc_enable, pc_in, RST_ADDRESS, pc_out);
 
     instruction_memory : ENTITY work.instruction_memory 
         GENERIC MAP (WORD_SIZE => INSTRUCTION_WORD_SIZE, ADDRESS_SIZE => ADDRESS_SIZE)
@@ -69,8 +69,8 @@ BEGIN
 
     pc_controller : ENTITY work.pc_controller GENERIC MAP(ADDRESS_SIZE => ADDRESS_SIZE)
         PORT MAP(
-            int_internal, pc_write_back, rst, jz_fetch, jmp_fetch, predicted_taken, 
-            false_prediction, pc_incremented, INT1_ADDRESS, RST_ADDRESS, jmp_register,
+            int_internal, pc_write_back, jz_fetch, jmp_fetch, predicted_taken, 
+            false_prediction, pc_incremented, INT1_ADDRESS, jmp_register,
             pc_write_back_data, pc_transparent_out, pc_in
         );
 
