@@ -68,7 +68,7 @@ BEGIN
     WITH mux_5_selectors SELECT sp_data_in <=
         sp_data_out + x"2" WHEN '0',
         sp_data_out - x"2" WHEN OTHERS;
-    sp_register : ENTITY work.RISING_EDGE_REG PORT MAP (CLK, RST, sp_enable, sp_data_in, sp_data_out);
+    sp_register : ENTITY work.SP_REG PORT MAP (CLK, RST, sp_enable, sp_data_in, sp_data_out);
 
     WITH mux_5_selectors SELECT sp_to_operand <=
         sp_data_in WHEN '0',
