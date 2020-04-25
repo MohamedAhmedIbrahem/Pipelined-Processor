@@ -26,7 +26,7 @@ set ram_contents_file [open $ram_contents_file_path]; list
 set ram_contents [read $ram_contents_file]; list
 set ram_contents [string trim $ram_contents]; list
 set ram_contents [split $ram_contents "\n"]; list
-set end_address [expr {[llength $ram_contents] - 1}]
+set end_address [expr {[llength $ram_contents] - 1}]; list
 
 force CLK 1 0, 0 50 -r 100
 force RST 1
