@@ -75,8 +75,8 @@ BEGIN
         sp_data_out WHEN OTHERS;
 
     WITH mux_7_selectors SELECT immediate_to_operand <=
-        (31 DOWNTO 17 => IR_low(1 TO 15), OTHERS => IR_high(15)) WHEN '0',
-        (31 DOWNTO 27 => IR_high(10 TO 14), OTHERS => '0') WHEN OTHERS;
+        (14 DOWNTO 0 => IR_low(1 TO 15), OTHERS => IR_high(15)) WHEN '0',
+        (3 DOWNTO 0 => IR_high(10 TO 14), OTHERS => '0') WHEN OTHERS;
 
     WITH mux_4_selectors SELECT second_operand <=
         sp_to_operand WHEN "00",
