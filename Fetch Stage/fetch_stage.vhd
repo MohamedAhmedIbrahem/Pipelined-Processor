@@ -31,8 +31,9 @@ ARCHITECTURE fetch_stage_arch OF fetch_stage IS
     CONSTANT RST_ADDRESS: std_logic_vector := std_logic_vector(to_unsigned(499, ADDRESS_SIZE));
     CONSTANT RTI2_ADDRESS: std_logic_vector := std_logic_vector(to_unsigned(498, ADDRESS_SIZE));
 
-    SIGNAL pc_in, pc_out, pc_transparent_in, forwarded_jmp_value, jmp_register: 
-        std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
+    SIGNAL pc_in, pc_transparent_in, forwarded_jmp_value, jmp_register : std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
+    SIGNAL pc_out : std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0) := (others => '0');
+        
     SIGNAL int_internal, jz_fetch, jmp_fetch, is_two_word, is_int_executing, Fetch_Forwarding_Enable: std_logic;
     SIGNAL pc_incremented : std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
     SIGNAL op_code: std_logic_vector(0 TO 4);
