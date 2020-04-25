@@ -1,7 +1,7 @@
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 
-ENTITY RISING_EDGE_REG IS
+ENTITY SP_REG IS
     GENERIC(Size: INTEGER := 32);
     PORT(
         CLK, RST, EN    : IN  STD_LOGIC;
@@ -10,14 +10,14 @@ ENTITY RISING_EDGE_REG IS
     );
 END ENTITY;
 
-ARCHITECTURE arch OF RISING_EDGE_REG IS
+ARCHITECTURE arch OF SP_REG IS
 BEGIN
     PROCESS(CLK, RST)
     BEGIN
         IF RISING_EDGE(CLK) THEN
-            IF RST='1' THEN
-                Dout <= (OTHERS => '0');
-            ELSIF EN='1' THEN
+            IF RST ='1' THEN
+                Dout <= (OTHERS => '1');
+            ELSIF EN ='1' THEN
                 Dout <= Din;
             END IF;
         END IF;

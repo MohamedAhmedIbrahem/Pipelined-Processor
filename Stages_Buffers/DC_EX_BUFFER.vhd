@@ -6,11 +6,11 @@ ENTITY DC_EX_BUFFER IS
         CLK, RST, EN                                    						: IN   STD_LOGIC;
         Op1,Op2                                         						: IN   STD_LOGIC_VECTOR(31 DOWNTO 0);    -- operands
         ALU_Op                                          						: IN   STD_LOGIC_VECTOR(3 DOWNTO 0) ;    -- ALU operation
-        SRC1,SRC2,DST1,DST2                             						: IN   STD_LOGIC_VECTOR(2 DOWNTO 0) ;    -- Registers' Adresses
+        SRC1,SRC2,DST1,DST2                             						: IN   STD_LOGIC_VECTOR(0 TO 2);	    -- Registers' Adresses
         WB1,WB2,WR,RD,I_O,PCWB,FLAGSWB,FLAGS_UPD,IS_SRC1,IS_SRC2  					: IN   STD_LOGIC;   			 -- Signals
         Op1_EX,Op2_EX                                         						: OUT  STD_LOGIC_VECTOR(31 DOWNTO 0);    -- operands
         ALU_Op_EX                                          						: OUT  STD_LOGIC_VECTOR(3 DOWNTO 0) ;    -- ALU operation
-        SRC1_EX,SRC2_EX,DST1_EX,DST2_EX                             					: OUT  STD_LOGIC_VECTOR(2 DOWNTO 0) ;    -- Registers' Adresses
+        SRC1_EX,SRC2_EX,DST1_EX,DST2_EX                             					: OUT  STD_LOGIC_VECTOR(0 TO 2);	    -- Registers' Adresses
         WB1_EX,WB2_EX,WR_EX,RD_EX,I_O_EX,PCWB_EX,FLAGSWB_EX,FLAGS_UPD_EX,IS_SRC1_EX,IS_SRC2_EX  	: OUT  STD_LOGIC                         -- Signals
     );
 END ENTITY;

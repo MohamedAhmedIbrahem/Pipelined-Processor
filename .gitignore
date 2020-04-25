@@ -1,0 +1,10 @@
+work/
+*.mti
+*.mpf
+*.ini
+*.wlf
+*.zip
+.idea/
+*.exe
+transcript
+*vscode*

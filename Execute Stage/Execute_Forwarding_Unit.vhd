@@ -5,14 +5,14 @@ USE IEEE.STD_LOGIC_SIGNED.ALL;
 
 ENTITY Execute_Forwarding_Unit IS
 	PORT (
-		CLK, RST 					: IN STD_LOGIC;
+		RST 						: IN STD_LOGIC;
 		IS_SRC1_EX, IS_SRC2_EX 				: IN STD_LOGIC; 			-- Execute Stage Signals
-		SRC1_EX, SRC2_EX				: IN STD_LOGIC_VECTOR(2 DOWNTO 0); 	-- Execute Stage SRC Addresses
+		SRC1_EX, SRC2_EX				: IN STD_LOGIC_VECTOR(0 TO 2);	 	-- Execute Stage SRC Addresses
 		WB1_MEM, WB2_MEM, RD_MEM, I_O_MEM 		: IN STD_LOGIC; 			-- Memory Stage Signals
-		DST1_MEM, DST2_MEM 				: IN STD_LOGIC_VECTOR(2 DOWNTO 0); 	-- Memory Stage DST Addresses
+		DST1_MEM, DST2_MEM 				: IN STD_LOGIC_VECTOR(0 TO 2);	 	-- Memory Stage DST Addresses
 		Op1_MEM, Op2_MEM 				: IN STD_LOGIC_VECTOR(31 DOWNTO 0); 	-- Memory Stage DST Registers
 		WB1_WB, WB2_WB 					: IN STD_LOGIC; 			-- Write Back Stage Signals
-		DST1_WB, DST2_WB 				: IN STD_LOGIC_VECTOR(2 DOWNTO 0); 	-- Write Back Stage DST Addresses
+		DST1_WB, DST2_WB 				: IN STD_LOGIC_VECTOR(0 TO 2); 		-- Write Back Stage DST Addresses
 		Op1_WB, Op2_WB 					: IN STD_LOGIC_VECTOR(31 DOWNTO 0); 	-- Write Back Stage DST Registers
 		Op1_EX_Forwarding_Enable, 
 		Op2_EX_Forwarding_Enable, 
@@ -23,7 +23,7 @@ END ENTITY;
 
 ARCHITECTURE Execute_Forwarding_Unit_Arch OF Execute_Forwarding_Unit IS
 BEGIN
-	PROCESS (CLK)
+	PROCESS (ALL)
 	BEGIN
 		IF (RST = '1') THEN
 			Op1_EX_Forwarding_Enable <= '0';

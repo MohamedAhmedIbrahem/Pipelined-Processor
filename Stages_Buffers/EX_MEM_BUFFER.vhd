@@ -5,11 +5,10 @@ ENTITY EX_MEM_BUFFER IS
     PORT(
 	CLK, RST, EN                                    		: IN   STD_LOGIC;
         Op1,Op2                                         		: IN   STD_LOGIC_VECTOR(31 DOWNTO 0);    -- operands
-        DST1,DST2                             				: IN   STD_LOGIC_VECTOR(2 DOWNTO 0);     -- Registers' Adresses
+        DST1,DST2                             				: IN   STD_LOGIC_VECTOR(0 TO 2);	     -- Registers' Adresses
         WB1,WB2,WR,RD,I_O,PCWB,FLAGSWB  				: IN   STD_LOGIC;                        -- Signals
         Op1_MEM,Op2_MEM                                         	: OUT  STD_LOGIC_VECTOR(31 DOWNTO 0);    -- operands
-        ALU_Op_MEM                                          		: OUT  STD_LOGIC_VECTOR(3 DOWNTO 0);     -- ALU operation
-        DST1_MEM,DST2_MEM                             			: OUT  STD_LOGIC_VECTOR(2 DOWNTO 0);     -- Registers' Adresses
+        DST1_MEM,DST2_MEM                             			: OUT  STD_LOGIC_VECTOR(0 TO 2);	     -- Registers' Adresses
         WB1_MEM,WB2_MEM,WR_MEM,RD_MEM,I_O_MEM,PCWB_MEM,FLAGSWB_MEM  	: OUT  STD_LOGIC                         -- Signals
     );
 END ENTITY;

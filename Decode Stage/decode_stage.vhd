@@ -30,11 +30,11 @@ ENTITY decode_stage IS
         jz : OUT std_logic;
         WR1_enable : IN std_logic;
         WR2_enable : IN std_logic;
-        WR1_address : IN std_logic_vector(2 DOWNTO 0);
-        WR2_address : IN std_logic_vector(2 DOWNTO 0);
+        WR1_address : IN std_logic_vector(0 TO 2);
+        WR2_address : IN std_logic_vector(0 TO 2);
         WR1_data : IN std_logic_vector(31 DOWNTO 0);
         WR2_data : IN std_logic_vector(31 DOWNTO 0);
-        RD3_address : IN std_logic_vector(2 DOWNTO 0);
+        RD3_address : IN std_logic_vector(0 TO 2);
         RD3_data : OUT std_logic_vector(31 DOWNTO 0)
     );
 END decode_stage;
@@ -68,15 +68,15 @@ BEGIN
     WITH mux_5_selectors SELECT sp_data_in <=
         sp_data_out + x"2" WHEN '0',
         sp_data_out - x"2" WHEN OTHERS;
-    sp_register : ENTITY work.RISING_EDGE_REG PORT MAP (CLK, RST, sp_enable, sp_data_in, sp_data_out);
+    sp_register : ENTITY work.SP_REG PORT MAP (CLK, RST, sp_enable, sp_data_in, sp_data_out);
 
     WITH mux_5_selectors SELECT sp_to_operand <=
         sp_data_in WHEN '0',
         sp_data_out WHEN OTHERS;
 
     WITH mux_7_selectors SELECT immediate_to_operand <=
-        (31 DOWNTO 17 => IR_low(15 DOWNTO 1), OTHERS => IR_high(15)) WHEN '0',
-        (31 DOWNTO 27 => IR_high(14 DOWNTO 10), OTHERS => '0') WHEN OTHERS;
+        (14 DOWNTO 0 => IR_low(1 TO 15), OTHERS => IR_high(15)) WHEN '0',
+        (4 DOWNTO 0 => IR_high(10 TO 14), OTHERS => '0') WHEN OTHERS;
 
     WITH mux_4_selectors SELECT second_operand <=
         sp_to_operand WHEN "00",

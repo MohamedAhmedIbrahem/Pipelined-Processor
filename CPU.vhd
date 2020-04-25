@@ -5,131 +5,117 @@ USE IEEE.numeric_std.ALL;
 
 ENTITY CPU IS
 	PORT (
-		CLK, RST 						: IN STD_LOGIC;
+		CLK, RST, INT 						: IN STD_LOGIC;
 		Input_Port                                              : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 		Output_Port						: OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
 	     );
 END ENTITY;
 
 ARCHITECTURE CPU_Arch OF CPU IS
-	COMPONENT IR_LOW IS
-    	GENERIC(Size: INTEGER := 16);
-    	PORT(
-        	CLK, RST, EN    : IN  STD_LOGIC;
-        	Din             : IN  STD_LOGIC_VECTOR(Size-1 DOWNTO 0);
-        	Dout            : OUT STD_LOGIC_VECTOR(Size-1 DOWNTO 0)
-    	);
-	END COMPONENT;
-
-	COMPONENT IR_HIGH IS
-    	GENERIC(Size: INTEGER := 16);
-    	PORT(
-       		CLK, RST, EN    : IN  STD_LOGIC;
-       	 	Din             : IN  STD_LOGIC_VECTOR(Size-1 DOWNTO 0);
-        	Dout            : OUT STD_LOGIC_VECTOR(Size-1 DOWNTO 0)
-    	);
-	END COMPONENT;
-
-	COMPONENT DC_EX_BUFFER IS
-    	PORT(
-        	CLK, RST, EN                                    						: IN   STD_LOGIC;
-        	Op1,Op2                                         						: IN   STD_LOGIC_VECTOR(31 DOWNTO 0);    -- operands
-        	ALU_Op                                          						: IN   STD_LOGIC_VECTOR(3 DOWNTO 0) ;    -- ALU operation
-        	SRC1,SRC2,DST1,DST2                             						: IN   STD_LOGIC_VECTOR(2 DOWNTO 0) ;    -- Registers' Adresses
-        	WB1,WB2,WR,RD,I_O,PCWB,FLAGSWB,FLAGS_UPD,IS_SRC1,IS_SRC2  					: IN   STD_LOGIC;   			 -- Signals
-        	Op1_EX,Op2_EX                                         						: OUT  STD_LOGIC_VECTOR(31 DOWNTO 0);    -- operands
-        	ALU_Op_EX                                          						: OUT  STD_LOGIC_VECTOR(3 DOWNTO 0) ;    -- ALU operation
-        	SRC1_EX,SRC2_EX,DST1_EX,DST2_EX                             					: OUT  STD_LOGIC_VECTOR(2 DOWNTO 0) ;    -- Registers' Adresses
-        	WB1_EX,WB2_EX,WR_EX,RD_EX,I_O_EX,PCWB_EX,FLAGSWB_EX,FLAGS_UPD_EX,IS_SRC1_EX,IS_SRC2_EX  	: OUT  STD_LOGIC                         -- Signals
-   	 );
-	END COMPONENT;
-
-	COMPONENT Execute_Stage IS
-	PORT (
-		CLK, RST 						: IN STD_LOGIC;
-		Op1_EX, Op2_EX                                  	: IN STD_LOGIC_VECTOR(31 DOWNTO 0);     -- operands
-        	ALU_Op_EX                                       	: IN STD_LOGIC_VECTOR(3 DOWNTO 0) ;     -- ALU operation
-        	SRC1_EX, SRC2_EX, DST1_EX, DST2_EX              	: IN STD_LOGIC_VECTOR(2 DOWNTO 0) ;     -- Registers' Adresses
-        	WB1_EX, WB2_EX, WR_EX, RD_EX, I_O_EX, PCWB_EX, 
-		FLAGSWB_EX, FLAGS_UPD_EX, IS_SRC1_EX, IS_SRC2_EX  	: IN STD_LOGIC;  			-- Signals 
-		WB1_MEM, WB2_MEM, RD_MEM, I_O_MEM 			: IN STD_LOGIC; 			-- Memory Stage Signals
-		DST1_MEM, DST2_MEM 					: IN STD_LOGIC_VECTOR(2 DOWNTO 0); 	-- Memory Stage DST Addresses
-		Op1_MEM, Op2_MEM 					: IN STD_LOGIC_VECTOR(31 DOWNTO 0);	-- Memory Stage DST Registers
-		WB1_WB, WB2_WB, FLAGSWB_WB	 			: IN STD_LOGIC; 			-- Write Back Stage Signals
-		DST1_WB, DST2_WB 					: IN STD_LOGIC_VECTOR(2 DOWNTO 0); 	-- Write Back Stage DST Addresses
-		Op1_WB, Op2_WB						: IN STD_LOGIC_VECTOR(31 DOWNTO 0); 	-- Write Back Stage DST Registers
-		Input_Port                              		: IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-        	Op1_EX_OUT, Op2_EX_OUT                  		: OUT STD_LOGIC_VECTOR(31 DOWNTO 0);    -- operands
-       	 	DST1_EX_OUT, DST2_EX_OUT                		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);     -- Registers' Adresses
-        	WB1_EX_OUT, WB2_EX_OUT, WR_EX_OUT, 
-		RD_EX_OUT, I_O_EX_OUT, PCWB_EX_OUT, FLAGSWB_EX_OUT  	: OUT STD_LOGIC;                        -- Signals 
-		EX_Forwarding_Stall					: OUT STD_LOGIC;    
-		Flags_Register                     			: OUT STD_LOGIC_VECTOR(3 DOWNTO 0)
-	     );
-	END COMPONENT;
-
-	COMPONENT EX_MEM_BUFFER IS
-    	PORT(
-		CLK, RST, EN                                    		: IN   STD_LOGIC;
-        	Op1, Op2                                         		: IN   STD_LOGIC_VECTOR(31 DOWNTO 0);    -- operands
-        	DST1,DST2                             				: IN   STD_LOGIC_VECTOR(2 DOWNTO 0);     -- Registers' Adresses
-        	WB1,WB2,WR,RD,I_O,PCWB,FLAGSWB  				: IN   STD_LOGIC;                        -- Signals
-        	Op1_MEM,Op2_MEM                                         	: OUT  STD_LOGIC_VECTOR(31 DOWNTO 0);    -- operands
-        	ALU_Op_MEM                                          		: OUT  STD_LOGIC_VECTOR(3 DOWNTO 0);     -- ALU operation
-        	DST1_MEM,DST2_MEM                             			: OUT  STD_LOGIC_VECTOR(2 DOWNTO 0);     -- Registers' Adresses
-        	WB1_MEM,WB2_MEM,WR_MEM,RD_MEM,I_O_MEM,PCWB_MEM,FLAGSWB_MEM  	: OUT  STD_LOGIC                         -- Signals
-    	);
-	END COMPONENT;
-
-	COMPONENT Memory_Stage IS
-	PORT (
-		CLK, RST 						: IN STD_LOGIC;
-		Op1_MEM, Op2_MEM                                  	: IN STD_LOGIC_VECTOR(31 DOWNTO 0);     -- operands
-        	DST1_MEM, DST2_MEM              			: IN STD_LOGIC_VECTOR(2 DOWNTO 0) ;     -- Registers' Adresses
-        	WB1_MEM, WB2_MEM, WR_MEM, RD_MEM, I_O_MEM,
-		PCWB_MEM, FLAGSWB_MEM 					: IN STD_LOGIC;
-        	Op1_MEM_OUT, Op2_MEM_OUT                  		: OUT STD_LOGIC_VECTOR(31 DOWNTO 0);    -- operands
-       	 	DST1_MEM_OUT, DST2_MEM_OUT                		: OUT STD_LOGIC_VECTOR(2 DOWNTO 0);     -- Registers' Adresses
-        	WB1_MEM_OUT, WB2_MEM_OUT, 
-		PCWB_MEM_OUT, FLAGSWB_MEM_OUT  				: OUT STD_LOGIC;                        -- Signals
-		Output_Port						: OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
-	     );
-	END COMPONENT;
-
-	COMPONENT MEM_WB_BUFFER IS
-    	PORT(
-		CLK, RST, EN                            : IN   STD_LOGIC					 ;
-        	Op1,Op2                                 : IN   STD_LOGIC_VECTOR(31 DOWNTO 0) ;    -- operands
-        	DST1,DST2                             	: IN   STD_LOGIC_VECTOR(2 DOWNTO 0)  ;    -- Registers' Adresses
-        	WB1,WB2,PCWB,FLAGSWB  			: IN   STD_LOGIC					 ;    -- Signals
-        	Op1_WB,Op2_WB                           : OUT  STD_LOGIC_VECTOR(31 DOWNTO 0) ;    -- operands
-        	DST1_WB,DST2_WB                         : OUT  STD_LOGIC_VECTOR(2 DOWNTO 0)	 ;    -- Registers' Adresses
-        	WB1_WB,WB2_WB,PCWB_WB,FLAGSWB_WB  	: OUT  STD_LOGIC					      -- Signals
-    	);
-	END COMPONENT;
-
-	SIGNAL Op1_EX, Op2_EX, Op1_MEM, Op2_MEM, Op1_WB, Op2_WB 			 : STD_LOGIC_VECTOR(31 DOWNTO 0);
-	SIGNAL WB1_EX, WB1_MEM, WB1_WB, WB2_EX, WB2_MEM, WB2_WB 			 : STD_LOGIC;
-	SIGNAL PCWB_EX, PCWB_MEM, PCWB_WB, FLAGSWB_EX, FLAGSWB_MEM, FLAGSWB_WB  	 : STD_LOGIC;
-	SIGNAL WR_EX, WR_MEM, RD_EX, RD_MEM, I_O_EX, I_O_MEM 				 : STD_LOGIC;
-	SIGNAL IS_SRC1_EX, IS_SRC2_EX, FLAGS_UPD_EX 					 : STD_LOGIC;
-	SIGNAL ALU_Op_EX, Flags_Register						 : STD_LOGIC_VECTOR(3 DOWNTO 0);
-	SIGNAL SRC1_EX, SRC2_EX, DST1_EX, DST1_MEM, DST1_WB, DST2_EX, DST2_MEM, DST2_WB  : STD_LOGIC_VECTOR(2 DOWNTO 0);
-	SIGNAL EX_Forwarding_Stall, Fetch_Forwarding_Stall 				 : STD_LOGIC;
+--------------------------------- Fetch Stage Ouput Signals -------------------------------------
+	SIGNAL PC_Transparent 								: STD_LOGIC_VECTOR(31 DOWNTO 0);
+	SIGNAL IR_FETCH 								: STD_LOGIC_VECTOR(0 TO 15);		
+    	SIGNAL P_TAKEN_FETCH, False_Prediction_FETCH     				: STD_LOGIC;			
+	SIGNAL PC_KEY_FETCH 								: STD_LOGIC_VECTOR(3 DOWNTO 0);
+--------------------------------- Decode Stage Input Signals -------------------------------------
+	SIGNAL IR_HIGH_DEC_IN, IR_LOW_DEC_IN						: STD_LOGIC_VECTOR(0 TO 15);
+	SIGNAL P_TAKEN_DEC_IN								: STD_LOGIC;
+	SIGNAL PC_KEY_DEC_IN  								: STD_LOGIC_VECTOR(3 DOWNTO 0); 
+--------------------------------- Decode Stage Output Signals -------------------------------------
+	SIGNAL Op1_DEC_OUT, Op2_DEC_OUT, Port3_DEC_OUT					: STD_LOGIC_VECTOR(31 DOWNTO 0);
+	SIGNAL WB1_DEC_OUT, WB2_DEC_OUT, PCWB_DEC_OUT, FLAGSWB_DEC_OUT, 
+	       WR_DEC_OUT,  RD_DEC_OUT, I_O_DEC_OUT, 
+	       IS_SRC1_DEC_OUT, IS_SRC2_DEC_OUT, FLAGS_UPD_DEC_OUT, JZ_DEC_OUT 		: STD_LOGIC;
+	SIGNAL ALU_OP_DEC_OUT							 	: STD_LOGIC_VECTOR(3 DOWNTO 0);
+	SIGNAL SRC1_DEC_OUT, SRC2_DEC_OUT, DST1_DEC_OUT, DST2_DEC_OUT			: STD_LOGIC_VECTOR(0 TO 2);
+--------------------------------- Execute Stage Intput Signals -------------------------------------
+	SIGNAL Op1_EX_IN, Op2_EX_IN 							: STD_LOGIC_VECTOR(31 DOWNTO 0);
+	SIGNAL WB1_EX_IN, WB2_EX_IN, PCWB_EX_IN, FLAGSWB_EX_IN, WR_EX_IN, 
+		RD_EX_IN, I_O_EX_IN, IS_SRC1_EX_IN, IS_SRC2_EX_IN, FLAGS_UPD_EX_IN 	: STD_LOGIC;
+	SIGNAL ALU_Op_EX_IN								: STD_LOGIC_VECTOR(3 DOWNTO 0);
+	SIGNAL SRC1_EX_IN, SRC2_EX_IN, DST1_EX_IN, DST2_EX_IN 				: STD_LOGIC_VECTOR(0 TO 2);
+--------------------------------- Execute Stage Output Signals -------------------------------------
+	SIGNAL Op1_EX_OUT, Op2_EX_OUT							: STD_LOGIC_VECTOR(31 DOWNTO 0);
+	SIGNAL WB1_EX_OUT,  WB2_EX_OUT, PCWB_EX_OUT, FLAGSWB_EX_OUT, 
+	       WR_EX_OUT, RD_EX_OUT, I_O_EX_OUT  					: STD_LOGIC;
+	SIGNAL DST1_EX_OUT, DST2_EX_OUT 						: STD_LOGIC_VECTOR(0 TO 2);
+--------------------------------- Memory Stage Input Signals -------------------------------------
+	SIGNAL Op1_MEM_IN, Op2_MEM_IN 							: STD_LOGIC_VECTOR(31 DOWNTO 0);
+	SIGNAL WB1_MEM_IN, WB2_MEM_IN, PCWB_MEM_IN, FLAGSWB_MEM_IN,
+	       WR_MEM_IN,  RD_MEM_IN,  I_O_MEM_IN  					: STD_LOGIC;
+	SIGNAL DST1_MEM_IN, DST2_MEM_IN							: STD_LOGIC_VECTOR(0 TO 2);
+--------------------------------- Memory Stage Output Signals -------------------------------------
+	SIGNAL Op1_MEM_OUT, Op2_MEM_OUT							: STD_LOGIC_VECTOR(31 DOWNTO 0);
+	SIGNAL WB1_MEM_OUT, WB2_MEM_OUT, PCWB_MEM_OUT, FLAGSWB_MEM_OUT  		: STD_LOGIC;
+	SIGNAL DST1_MEM_OUT, DST2_MEM_OUT 						: STD_LOGIC_VECTOR(0 TO 2);
+----------------------------------  Write Back Stage Signals ----------------------------------------
+	SIGNAL Op1_WB, Op2_WB 								: STD_LOGIC_VECTOR(31 DOWNTO 0);
+	SIGNAL WB1_WB, WB2_WB, PCWB_WB, FLAGSWB_WB		 			: STD_LOGIC;
+	SIGNAL DST1_WB, DST2_WB 							: STD_LOGIC_VECTOR(0 TO 2);
+----------------------------------  Other Signals ---------------------------------------- 
+	SIGNAL EX_Forwarding_Stall, Fetch_Forwarding_Stall, PCWB_Stall 			: STD_LOGIC;
+	SIGNAL Flags      	            						: STD_LOGIC_VECTOR(3 DOWNTO 0);		
 BEGIN
 
-EX_Stage : Execute_Stage PORT MAP (CLK, RST, Op1_EX, Op2_EX, ALU_Op_EX, SRC1_EX, SRC2_EX, DST1_EX, DST2_EX,              	        	
-				  WB1_EX, WB2_EX, WR_EX, RD_EX, I_O_EX, PCWB_EX, FLAGSWB_EX, FLAGS_UPD_EX, IS_SRC1_EX, IS_SRC2_EX,  	
-				  WB1_MEM, WB2_MEM, RD_MEM, I_O_MEM, DST1_MEM, DST2_MEM, Op1_MEM, Op2_MEM, WB1_WB, WB2_WB, FLAGSWB_WB,	 			
-				  DST1_WB, DST2_WB, Op1_WB, Op2_WB, Input_Port, Op1_MEM, Op2_MEM, DST1_MEM, DST2_MEM, WB1_MEM, 
-				  WB2_MEM, WR_MEM, RD_MEM, I_O_MEM, PCWB_MEM, FLAGSWB_MEM, EX_Forwarding_Stall, Flags_Register);
-	
-EX_MEM_BUFF : EX_MEM_BUFFER PORT MAP (CLK, (RST OR EX_Forwarding_Stall), '1', Op1_MEM, Op2_MEM, DST1_MEM, DST2_MEM,                             			
-        			      WB1_MEM ,WB2_MEM ,WR_MEM ,RD_MEM ,I_O,_MEM, PCWB_MEM ,FLAGSWB_MEM, Op1_MEM, Op2_MEM                                         	
-        	ALU_Op_MEM                                          		
-        	DST1_MEM,DST2_MEM                             			
-        	WB1_MEM,WB2_MEM,WR_MEM,RD_MEM,I_O_MEM,PCWB_MEM,FLAGSWB_MEM  	
-    	);
-	END COMPONENT;	
+PCWB_Stall <= PCWB_DEC_OUT OR PCWB_EX_IN OR PCWB_MEM_IN OR PCWB_WB;
 
+---------------------------------------------- Fetch Stage ----------------------------------------------------------
+Fetch_Stage : ENTITY work.Fetch_Stage GENERIC MAP (16, 32, 4) PORT MAP (CLK, RST, NOT (Fetch_Forwarding_Stall OR PCWB_Stall OR EX_Forwarding_Stall),
+								       INT, PCWB_WB, P_TAKEN_DEC_IN, JZ_DEC_OUT, Flags(0), PCWB_Stall,
+								       Port3_DEC_OUT, Op1_WB, PC_KEY_DEC_IN, WB1_DEC_OUT, WB2_DEC_OUT,
+								       WB1_EX_IN, WB2_EX_IN, WB1_MEM_IN, WB2_MEM_IN, RD_MEM_IN, I_O_MEM_IN,
+								       DST1_DEC_OUT, DST2_DEC_OUT, DST1_EX_IN, DST2_EX_IN, DST1_MEM_IN, DST2_MEM_IN,
+								       Op1_MEM_IN, Op2_MEM_IN, Fetch_Forwarding_Stall, P_TAKEN_FETCH, False_Prediction_FETCH,
+								       PC_KEY_FETCH, PC_Transparent, IR_FETCH);
+
+---------------------------------------------- Fetch/Decode Buffer -----------------------------------------------------
+FETCH_DC_BUFFER : ENTITY work.FETCH_DC_BUFFER PORT MAP (CLK, RST OR (Fetch_Forwarding_Stall OR PCWB_Stall OR False_Prediction_FETCH), 
+					               (NOT EX_Forwarding_Stall), (EX_Forwarding_Stall NOR ((NOT IR_FETCH(0)) AND IR_FETCH(1))),  
+        				  	       P_TAKEN_FETCH, P_TAKEN_DEC_IN, PC_KEY_FETCH, PC_KEY_DEC_IN,
+	    				               IR_FETCH, IR_HIGH_DEC_IN, IR_LOW_DEC_IN);
+
+---------------------------------------------- Decode Stage -------------------------------------------------------------
+Decode_Stage : ENTITY work.Decode_Stage PORT MAP (CLK, RST, IR_HIGH_DEC_IN, IR_LOW_DEC_IN, (NOT EX_Forwarding_Stall),  
+	        		   		  PC_Transparent, Flags, Op1_DEC_OUT, Op2_DEC_OUT, ALU_OP_DEC_OUT,
+				   		  FLAGS_UPD_DEC_OUT, WB1_DEC_OUT, WB2_DEC_OUT, WR_DEC_OUT, RD_DEC_OUT,
+				   		  I_O_DEC_OUT, PCWB_DEC_OUT, FLAGSWB_DEC_OUT, SRC1_DEC_OUT, SRC2_DEC_OUT,
+	        		   		  IS_SRC1_DEC_OUT, IS_SRC2_DEC_OUT, DST1_DEC_OUT, DST2_DEC_OUT, JZ_DEC_OUT,  
+	        		   		  WB1_WB, WB2_WB, DST1_WB, DST2_WB, Op1_WB, Op2_WB, IR_FETCH(10 TO 12), Port3_DEC_OUT);
+
+---------------------------------------------- Decode/Execute Buffer ------------------------------------------------------
+DC_EX_BUFFER : ENTITY work.DC_EX_BUFFER PORT MAP (CLK, RST, (NOT EX_Forwarding_Stall),                                     						
+        	 		    Op1_DEC_OUT, Op2_DEC_OUT, ALU_OP_DEC_OUT, SRC1_DEC_OUT, SRC2_DEC_OUT, DST1_DEC_OUT, DST2_DEC_OUT,                            						    
+        			    WB1_DEC_OUT, WB2_DEC_OUT, WR_DEC_OUT, RD_DEC_OUT, I_O_DEC_OUT, PCWB_DEC_OUT, FLAGSWB_DEC_OUT,
+				    FLAGS_UPD_DEC_OUT, IS_SRC1_DEC_OUT, IS_SRC2_DEC_OUT, Op1_EX_IN, Op2_EX_IN, 
+				    ALU_Op_EX_IN, SRC1_EX_IN, SRC2_EX_IN, DST1_EX_IN, DST2_EX_IN, WB1_EX_IN, 
+				    WB2_EX_IN, WR_EX_IN, RD_EX_IN, I_O_EX_IN, PCWB_EX_IN, FLAGSWB_EX_IN, 
+				    FLAGS_UPD_EX_IN, IS_SRC1_EX_IN, IS_SRC2_EX_IN);
+
+---------------------------------------------- Execute Stage ---------------------------------------------------------------
+Execute_Stage : ENTITY work.Execute_Stage PORT MAP (CLK, RST, Op1_EX_IN, Op2_EX_IN, ALU_Op_EX_IN, SRC1_EX_IN, SRC2_EX_IN, DST1_EX_IN, DST2_EX_IN,              	        	
+				   WB1_EX_IN, WB2_EX_IN, WR_EX_IN, RD_EX_IN, I_O_EX_IN, PCWB_EX_IN, FLAGSWB_EX_IN, 
+				   FLAGS_UPD_EX_IN, IS_SRC1_EX_IN, IS_SRC2_EX_IN, WB1_MEM_IN, WB2_MEM_IN, RD_MEM_IN, 
+				   I_O_MEM_IN, DST1_MEM_IN, DST2_MEM_IN, Op1_MEM_IN, Op2_MEM_IN, WB1_WB, WB2_WB, FLAGSWB_WB,	 			
+				   DST1_WB, DST2_WB, Op1_WB, Op2_WB, Input_Port, 
+				   Op1_EX_OUT, Op2_EX_OUT, DST1_EX_OUT, DST2_EX_OUT, WB1_EX_OUT, 
+				   WB2_EX_OUT, WR_EX_OUT, RD_EX_OUT, I_O_EX_OUT, PCWB_EX_OUT, FLAGSWB_EX_OUT, 
+				   EX_Forwarding_Stall, Flags);
+
+---------------------------------------------- Execute/Memory Buffer ----------------------------------------------------------	
+EX_MEM_BUFFER : ENTITY work.EX_MEM_BUFFER PORT MAP (CLK, (RST OR EX_Forwarding_Stall), '1', Op1_EX_OUT, Op2_EX_OUT, DST1_EX_OUT, DST2_EX_OUT,                             			
+        			      WB1_EX_OUT, WB2_EX_OUT, WR_EX_OUT, RD_EX_OUT, I_O_EX_OUT, PCWB_EX_OUT, FLAGSWB_EX_OUT, 
+				      Op1_MEM_IN, Op2_MEM_IN, DST1_MEM_IN, DST2_MEM_IN, WB1_MEM_IN, WB2_MEM_IN, 
+				      WR_MEM_IN, RD_MEM_IN, I_O_MEM_IN, PCWB_MEM_IN, FLAGSWB_MEM_IN);
+
+---------------------------------------------- Memory Stage ---------------------------------------------------------------------
+Memory_Stage : ENTITY work.Memory_Stage PORT MAP (CLK, RST, Op1_MEM_IN, Op2_MEM_IN, DST1_MEM_IN, DST2_MEM_IN, WB1_MEM_IN, WB2_MEM_IN, 
+				    WR_MEM_IN, RD_MEM_IN, I_O_MEM_IN, PCWB_MEM_IN, FLAGSWB_MEM_IN, Op1_MEM_OUT, Op2_MEM_OUT,                  		
+       	 			    DST1_MEM_OUT, DST2_MEM_OUT, WB1_MEM_OUT, WB2_MEM_OUT, PCWB_MEM_OUT, FLAGSWB_MEM_OUT, Output_Port); 
+
+---------------------------------------------- Memory/Write Back Buffer ----------------------------------------------------------			 				
+MEM_WB_BUFFER : ENTITY work.MEM_WB_BUFFER PORT MAP (CLK, RST, '1', Op1_MEM_OUT, Op2_MEM_OUT, DST1_MEM_OUT, DST2_MEM_OUT, 
+			            WB1_MEM_OUT, WB2_MEM_OUT, PCWB_MEM_OUT, FLAGSWB_MEM_OUT, Op1_WB, Op2_WB, 
+				    DST1_WB, DST2_WB, WB1_WB, WB2_WB, PCWB_WB, FLAGSWB_WB);  	
+
+----------------------------------------------------------------------------------------------------------------------------------
 END CPU_Arch;
