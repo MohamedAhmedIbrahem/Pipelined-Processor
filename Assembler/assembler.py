@@ -101,7 +101,7 @@ class Assembler():
             except:
                 pass
                 #print("Invalid instruction Format!")
-            return '0'*16,0
+        return '0'*16,0
         
     def __read_code_file(self):
 
