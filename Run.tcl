@@ -1,3 +1,11 @@
+## Assembler
+proc Assemble {} {
+    set output [exec python Assembler/assembler.py]
+    puts $output
+}
+
+Assemble
+
 vsim CPU  
 add wave *
 add wave Fetch_Stage/instruction_memory/memory
@@ -5,7 +13,7 @@ add wave Fetch_Stage/pc_out
 add wave Fetch_Stage/pc_in
 add wave Fetch_Stage/pc_enable
 
-set ram_contents_file_path CODE_RAM.txt; list
+set ram_contents_file_path Assembler/CODE_RAM.txt; list
 set ram_sim_path "CPU/Fetch_Stage/instruction_memory/memory"; list
 
 set ram_contents_file [open $ram_contents_file_path]; list

@@ -78,11 +78,11 @@ class Assembler():
                     for i in range(1,len(words)):
                         ir += self.registers[words[i]]
                     ir += ('0' * (16-len(ir)))
-                    print("GroupA",ir,len(ir))
+                    #print("GroupA",ir,len(ir))
                     return ir,1
                 elif words[0] in self.groupB.keys():    #shift
                     ir = "00" + self.groupB[words[0]] + self.registers[words[1]] + bin(int(words[2])).replace("0b","").zfill(5) + "0"
-                    print("GroupB",ir,len(ir))
+                    #print("GroupB",ir,len(ir))
                     return ir,1
                 elif words[0] in self.groupC.keys():    #immediate
                     if words[0] in self.TwoOperand:     #ldm
@@ -91,15 +91,15 @@ class Assembler():
                     else:                               #iadd
                         immediate_value = bin(int(words[3])).replace("0b","").zfill(16)
                         ir ="01" + self.groupC[words[0]] + self.registers[words[1]] + self.registers[words[2]] + "00" + immediate_value[0] + "1" + immediate_value[1:]
-                    print("GroupC",ir,len(ir))
+                    #print("GroupC",ir,len(ir))
                     return ir,2
                 elif words[0] in self.groupD.keys():    #memory
                     effective_address = bin(int(words[2])).replace("0b","").zfill(20)
                     ir = "01" + self.groupD[words[0]] + self.registers[words[1]] + "0" + effective_address[:5] + "1" + effective_address[5:]
-                    print("GroupD",ir,len(ir))
+                    #print("GroupD",ir,len(ir))
                     return ir,2
             except:
-                print("Invalid instruction Format!")
+                #print("Invalid instruction Format!")
         return '0'*16,0
     def __read_code_file(self):
 
@@ -126,7 +126,7 @@ class Assembler():
             if line_words[0].isnumeric():
                 number = bin(int(line_words[0])).replace("0b","").zfill(16)
                 if(len(number) != 16):
-                    print("Large Number!")
+                    #print("Large Number!")
                     return
                 self.binary_code[self.current_code_mem_location] = number
                 self.current_code_mem_location += 1
@@ -135,7 +135,7 @@ class Assembler():
             ir, size = self.__get_instruction_info(line)
 
             if size == 0:
-                print("invalid instruction !")
+                #print("invalid instruction !")
                 return
             elif size == 1 and len(ir)==16:
                 self.binary_code[self.current_code_mem_location] = ir
@@ -143,7 +143,7 @@ class Assembler():
                     self.binary_code[self.current_code_mem_location]   = ir[16:]
                     self.binary_code[self.current_code_mem_location+1] = ir[:16]
             else:
-                print("Large immediate value!")
+                #print("Large immediate value!")
                 return
             self.current_code_mem_location += size
 
@@ -157,7 +157,7 @@ class Assembler():
                     f.write('0'*16 + "\n")
 
 if __name__ == '__main__':
-    code_file_path = 'code.txt'
-    code_ram_file_path = '../CODE_RAM.txt'
+    code_file_path = 'assembler/code.txt'
+    code_ram_file_path = './CODE_RAM.txt'
     a = Assembler(code_file_path, code_ram_file_path)
     a.parse()
