@@ -1,0 +1,42 @@
+.Rst 2
+.INt 100
+
+;this is comment 
+.Org 8
+inc r1 
+nop
+inc r1
+dec r2
+not r1
+out r1
+    in r3
+swap r1,r3 ;this is swap
+;add r1,r2,r3
+add r1,r2,r3
+
+.oRG 25
+IADD r1,r2,15
+
+sub r1,r2,r3
+
+ANd r1,r2,r3 
+shl r1,15
+shr r2,20
+
+push r1 
+
+pop r2 
+
+ldm r4,200 
+ldd r4,1
+std r1,200
+
+jz r1
+jmp r6
+nop
+nop 
+nop 
+nop
+call r7
+ret
+rti

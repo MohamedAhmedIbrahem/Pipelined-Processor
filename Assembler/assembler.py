@@ -2,10 +2,10 @@ import sys
 
 class Assembler():
 
-    def __init__(self, path, code_output_path):
-        self.number_of_lines = (1<<20)
+    def __init__(self, path, code_output_path,data_ram_path):
         self.path = path
         self.code_output_path = code_output_path
+        self.data_ram_path = data_ram_path
 
         self.registers = {'r0': '000',
                           'r1': '001', 
@@ -21,6 +21,8 @@ class Assembler():
         self.current_code_mem_location = 0
 
         self.binary_code = {}
+        self.data_ram = {}
+
         self.groupA = { "nop" : "00000",
                         "swap": "10001",
                         "not" : "10010",
@@ -53,10 +55,12 @@ class Assembler():
         self.OneOperand = ["not","inc","dec","out","in","push","pop","jz","jmp","call"]
         self.TwoOperand = ["swap","shl","shr","ldm","ldd","std"]
         self.ThreeOperand = ["add","iadd","sub","and","or"]
+        
     def parse(self):
         self.__read_code_file()     
         self.__scan_code()
         self.__save_instructions()
+        self.__save_data()
 
     def __get_instruction_info(self, line):
         words = []
@@ -99,10 +103,8 @@ class Assembler():
                     #print("GroupD",ir,len(ir))
                     return ir,2
             except:
-                pass
-                #print("Invalid instruction Format!")
+                print("Invalid instruction Format!")
         return '0'*16,0
-        
     def __read_code_file(self):
 
         with open(self.path) as FILE:
@@ -122,22 +124,26 @@ class Assembler():
             line = self.code_lines[i]
             line_words = line.split(" ", 1)
 
+            if len(line_words) == 2 and (line_words[0][:4] == '.rst' or line_words[0][:4] == '.int'):
+                if line_words[1].strip().isnumeric():
+                    number = bin(int(line_words[1].strip())).replace("0b","").zfill(32)
+                    if len(number) != 32:
+                        print("Large Number")
+                        break
+                    self.data_ram[line_words[0][1:4]] = number
+                    continue
+                else:
+                    print("invalid RST/INT address!")
+                    break
+           
             if line_words[0][:4] == '.org':
                 self.current_code_mem_location = int(line_words[1].strip())
                 continue
-            if line_words[0].isnumeric():
-                number = bin(int(line_words[0])).replace("0b","").zfill(16)
-                if(len(number) != 16):
-                    #print("Large Number!")
-                    return
-                self.binary_code[self.current_code_mem_location] = number
-                self.current_code_mem_location += 1
-                continue
-
+            
             ir, size = self.__get_instruction_info(line)
 
             if size == 0:
-                #print("invalid instruction !")
+                print("invalid instruction !")
                 return
             elif size == 1 and len(ir)==16:
                 self.binary_code[self.current_code_mem_location] = ir
@@ -145,21 +151,33 @@ class Assembler():
                     self.binary_code[self.current_code_mem_location]   = ir[16:]
                     self.binary_code[self.current_code_mem_location+1] = ir[:16]
             else:
-                #print("Large immediate value!")
+                print("Large immediate value!")
                 return
             self.current_code_mem_location += size
 
     def __save_instructions(self):
+        if len(self.binary_code.keys()) == 0:
+            return
         mx = max(self.binary_code.keys())
         with open(self.code_output_path, "w") as f:
-            for address in range(mx + 1):
+            for address in range(mx+1):
                 if address in self.binary_code.keys():
                     f.write(self.binary_code[address]+"\n")
                 else:
                     f.write('0'*16 + "\n")
 
+    def __save_data(self):
+        if len(self.data_ram.keys()) == 0:
+            return
+        with open(self.data_ram_path, "w") as f:
+            f.write(self.data_ram['rst'][:16] + '\n')
+            f.write(self.data_ram['rst'][16:] + '\n')
+            f.write(self.data_ram['int'][:16] + '\n')
+            f.write(self.data_ram['int'][16:] + '\n')
+
 if __name__ == '__main__':
-    code_file_path = 'Code.txt'
-    code_ram_file_path = 'CODE_RAM.txt'
-    a = Assembler(code_file_path, code_ram_file_path)
+    code_file_path = sys.argv[1]
+    code_ram_file_path = sys.argv[2]
+    data_ram_file_path = sys.argv[3]
+    a = Assembler(code_file_path, code_ram_file_path,data_ram_file_path)
     a.parse()
