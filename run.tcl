@@ -17,6 +17,7 @@ vsim CPU
 add wave *
 add wave $instruction_memory_sim_path/memory
 add wave $data_memory_sim_path/Mem
+add wave $data_memory_sim_path/*
 add wave Decode_Stage/registers/Register_File
 
 # Remove numeric std warnings before initialization
