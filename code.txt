@@ -1,4 +1,4 @@
-.Rst 2
+.Rst 8
 .INt 100
 
 ;this is comment 

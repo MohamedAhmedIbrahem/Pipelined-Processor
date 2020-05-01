@@ -1,5 +1,6 @@
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.all;
 
 ENTITY SP_REG IS
     GENERIC(Size: INTEGER := 32);
@@ -16,7 +17,7 @@ BEGIN
     BEGIN
         IF RISING_EDGE(CLK) THEN
             IF RST ='1' THEN
-                Dout <= (OTHERS => '1');
+                Dout <= std_logic_vector(to_unsigned(1998, Size));
             ELSIF EN ='1' THEN
                 Dout <= Din;
             END IF;

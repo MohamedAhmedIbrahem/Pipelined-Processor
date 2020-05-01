@@ -53,14 +53,15 @@ ARCHITECTURE CPU_Arch OF CPU IS
 	SIGNAL WB1_WB, WB2_WB, PCWB_WB, FLAGSWB_WB		 			: STD_LOGIC;
 	SIGNAL DST1_WB, DST2_WB 							: STD_LOGIC_VECTOR(0 TO 2);
 ----------------------------------  Other Signals ---------------------------------------- 
-	SIGNAL EX_Forwarding_Stall, Fetch_Forwarding_Stall, PCWB_Stall 			: STD_LOGIC;
+	SIGNAL EX_Forwarding_Stall, Fetch_Forwarding_Stall, PCWB_Stall, PCWB_Stall_PC_enable : STD_LOGIC;
 	SIGNAL Flags      	            						: STD_LOGIC_VECTOR(3 DOWNTO 0);		
 BEGIN
 
-PCWB_Stall <= PCWB_DEC_OUT OR PCWB_EX_IN OR PCWB_MEM_IN OR PCWB_WB;
+PCWB_Stall_PC_enable <= PCWB_DEC_OUT OR PCWB_EX_IN OR PCWB_MEM_IN;
+PCWB_Stall <= PCWB_Stall_PC_enable OR PCWB_WB;
 
 ---------------------------------------------- Fetch Stage ----------------------------------------------------------
-Fetch_Stage : ENTITY work.Fetch_Stage GENERIC MAP (16, 32, 4) PORT MAP (CLK, RST, NOT (Fetch_Forwarding_Stall OR PCWB_Stall OR EX_Forwarding_Stall),
+Fetch_Stage : ENTITY work.Fetch_Stage GENERIC MAP (16, 32, 4) PORT MAP (CLK, RST, NOT (Fetch_Forwarding_Stall OR PCWB_Stall_PC_enable OR EX_Forwarding_Stall),
 								       INT, PCWB_WB, P_TAKEN_DEC_IN, JZ_DEC_OUT, Flags(0), PCWB_Stall,
 								       Port3_DEC_OUT, Op1_WB, PC_KEY_DEC_IN, WB1_DEC_OUT, WB2_DEC_OUT,
 								       WB1_EX_IN, WB2_EX_IN, WB1_MEM_IN, WB2_MEM_IN, RD_MEM_IN, I_O_MEM_IN,

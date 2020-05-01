@@ -26,10 +26,15 @@ ENTITY fetch_stage IS
 END;
 
 ARCHITECTURE fetch_stage_arch OF fetch_stage IS
+    CONSTANT INSTRUCTION_MEMORY_SIZE : integer := 100;
+    CONSTANT INTERNAL_INSTRUCTIONS_START_ADDRESS : integer := INSTRUCTION_MEMORY_SIZE - 8;
     -- Constant JUMP addresses --
-    CONSTANT INT1_ADDRESS : std_logic_vector := std_logic_vector(to_unsigned(500, ADDRESS_SIZE));
-    CONSTANT RST_ADDRESS: std_logic_vector := std_logic_vector(to_unsigned(499, ADDRESS_SIZE));
-    CONSTANT RTI2_ADDRESS: std_logic_vector := std_logic_vector(to_unsigned(498, ADDRESS_SIZE));
+    CONSTANT RST_ADDRESS: std_logic_vector := std_logic_vector(
+                            to_unsigned(INTERNAL_INSTRUCTIONS_START_ADDRESS + 5, ADDRESS_SIZE));
+    CONSTANT RTI2_ADDRESS: std_logic_vector := std_logic_vector(
+                            to_unsigned(INTERNAL_INSTRUCTIONS_START_ADDRESS + 4, ADDRESS_SIZE));
+    CONSTANT INT1_ADDRESS : std_logic_vector := std_logic_vector(
+                            to_unsigned(INTERNAL_INSTRUCTIONS_START_ADDRESS, ADDRESS_SIZE));
 
     SIGNAL pc_in, pc_transparent_in, forwarded_jmp_value, jmp_register : std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
     SIGNAL pc_out : std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0) := (others => '0');
@@ -61,8 +66,12 @@ BEGIN
         PORT MAP(clk, rst, pc_enable, pc_in, RST_ADDRESS, pc_out);
 
     instruction_memory : ENTITY work.instruction_memory 
-        GENERIC MAP (WORD_SIZE => INSTRUCTION_WORD_SIZE, ADDRESS_SIZE => ADDRESS_SIZE)
-        PORT MAP(clk, rst, '0', pc_out, (OTHERS => 'Z'), (OTHERS => 'Z'), ir_fetch); 
+        GENERIC MAP (
+            WORD_SIZE => INSTRUCTION_WORD_SIZE, 
+            ADDRESS_SIZE => ADDRESS_SIZE, 
+            MEMORY_SIZE  => INSTRUCTION_MEMORY_SIZE
+        )
+        PORT MAP(clk, '0', '0', pc_out, (OTHERS => 'Z'), ir_fetch); 
 
     pc_transparent : ENTITY work.RISING_EDGE_REG GENERIC MAP (SIZE => ADDRESS_SIZE)
         PORT MAP(clk, rst, '1', pc_transparent_in, pc_transparent_out);
