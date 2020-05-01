@@ -18,7 +18,7 @@ ARCHITECTURE Register_File_Arch OF Register_File IS
 	SIGNAL Register_File : bus_array(0 TO 7)(31 DOWNTO 0);
 BEGIN
 	PROCESS (CLK) BEGIN
-		IF FALLING_EDGE(CLK) THEN
+		IF RISING_EDGE(CLK) THEN
 			IF RST = '1' THEN
 				Register_File <= (OTHERS => (OTHERS => '0'));
 			ELSE
