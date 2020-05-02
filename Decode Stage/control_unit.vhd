@@ -30,7 +30,7 @@ ARCHITECTURE control_unit_operation OF control_unit IS
     SIGNAL control_signals : std_logic_vector(22 DOWNTO 0);
 BEGIN
     WITH opcode SELECT control_signals <=
-        "00001000000110101011001" WHEN "10001",
+        "00001000000110101011000" WHEN "10001",
         "01011000001110001011001" WHEN "10101",
         "01101000001110001011001" WHEN "10110",
         "01111000001110001011001" WHEN "10111",
