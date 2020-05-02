@@ -16,19 +16,20 @@ ENTITY DATA_RAM IS
 END ENTITY;
 
 ARCHITECTURE arch_DATA_RAM OF DATA_RAM IS
-    CONSTANT MEMORY_SIZE: integer := 2000;
+    CONSTANT MEMORY_SIZE: integer := 2002;
     TYPE memory IS ARRAY(0 TO MEMORY_SIZE-1) OF STD_LOGIC_VECTOR(CellSize-1 DOWNTO 0);
     SIGNAL Mem : memory := (OTHERS => (OTHERS => '0'));
     SIGNAL Read_Address : STD_LOGIC_VECTOR(AddressWidth-1 DOWNTO 0);
 BEGIN
-    Read_Address <= Address WHEN RD = '1' ELSE (OTHERS => '0');
-    Dout <= Mem(TO_INTEGER(UNSIGNED(Read_Address))) & Mem(TO_INTEGER(UNSIGNED(Read_Address) + 1));
 
+  --Read_Address <= Address WHEN RD = '1' ELSE (OTHERS => '0');
+    Dout <= Mem(TO_INTEGER(UNSIGNED(Address))) & Mem(TO_INTEGER(UNSIGNED(Address) + 1));
+  
     PROCESS(CLK,RST)
     BEGIN
-		IF RST = '1' THEN
-			Mem <= (OTHERS => (OTHERS => '0'));
-		END IF;
+	IF RST = '1' THEN
+		Mem <= (OTHERS => (OTHERS => '0'));
+	END IF;
         IF RISING_EDGE(CLK) and RST = '0' THEN
             IF WR='1' THEN
                 Mem(TO_INTEGER(UNSIGNED(Address))) <= Din(2*CellSize-1 DOWNTO CellSize);

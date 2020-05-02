@@ -14,18 +14,19 @@ if {[catch { exec python Assembler/assembler.py $code_file_path $code_ram_file_p
 
 ### Initialize simulation
 vsim CPU  
-add wave *
-add wave $instruction_memory_sim_path/memory
-add wave $data_memory_sim_path/Mem
-add wave $data_memory_sim_path/*
-add wave Decode_Stage/registers/Register_File
+add wave -unsigned *
+add wave -unsigned CPU/Fetch_Stage/fetch_forwarding_unit/*
+add wave -unsigned CPU/Execute_Stage/EX_FORW_UNIT/*
+add wave -unsigned $instruction_memory_sim_path/memory
+add wave -unsigned $data_memory_sim_path/Mem
+add wave -unsigned $data_memory_sim_path/*
+add wave -unsigned Decode_Stage/registers/Register_File
 
 # Remove numeric std warnings before initialization
 set NumericStdNoWarnings 1; list
 run 0
 set NumericStdNoWarnings 0; list
 
-## 2 ^ 32 - 2 didn't work on Data RAM => Modify it
 ############################
 add wave -radix unsigned Fetch_Stage/pc_out
 add wave -radix unsigned Fetch_Stage/pc_in

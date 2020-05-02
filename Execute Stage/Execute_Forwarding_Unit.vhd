@@ -32,6 +32,9 @@ BEGIN
 			Op2_EX_Forwarded <= (OTHERS => '0');
 			EX_Forwarding_Stall <= '0';
 		ELSE
+			Op1_EX_Forwarding_Enable <= '0';
+			Op2_EX_Forwarding_Enable <= '0';
+			EX_Forwarding_Stall <= '0';
 ----------------------------------------- SRC 1 -----------------------------------------------------
 			IF (IS_SRC1_EX = '1') AND 
 			   (((WB1_MEM = '1') AND (SRC1_EX = DST1_MEM)) OR ((WB2_MEM = '1') AND (SRC1_EX = DST2_MEM))) THEN -- Memory Stage	
