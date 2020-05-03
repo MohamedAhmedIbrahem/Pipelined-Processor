@@ -39,7 +39,7 @@ ARCHITECTURE fetch_stage_arch OF fetch_stage IS
     SIGNAL pc_in, pc_transparent_in, forwarded_jmp_value, jmp_register : std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
     SIGNAL pc_out : std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0) := (others => '0');
         
-    SIGNAL int_internal, jz_fetch, jmp_fetch, int1_fetch, int2_fetch, is_two_word, is_int_executing, Fetch_Forwarding_Enable: std_logic;
+    SIGNAL int_internal, jz_fetch, jmp_fetch, int1_fetch, int2_fetch, rti_fetch, is_two_word, is_int_executing, Fetch_Forwarding_Enable: std_logic;
     SIGNAL pc_incremented : std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
     SIGNAL op_code: std_logic_vector(0 TO 4);
 BEGIN
@@ -50,7 +50,8 @@ BEGIN
 
     op_code <= ir_fetch(2 TO 6);
 
-    branch_decoder: ENTITY work.branch_decoder PORT MAP (op_code, jmp_fetch, jz_fetch, int1_fetch, int2_fetch);   
+    branch_decoder: ENTITY work.branch_decoder 
+        PORT MAP (op_code, jmp_fetch, jz_fetch, int1_fetch, int2_fetch, rti_fetch);   
     
     prediction_cache_key <= pc_out(PREDICTION_CACHE_KEY_SIZE-1 DOWNTO 0);
 
@@ -76,8 +77,8 @@ BEGIN
 
     pc_controller : ENTITY work.pc_controller GENERIC MAP(ADDRESS_SIZE => ADDRESS_SIZE)
         PORT MAP(
-            int_internal, pc_write_back, jz_fetch, jmp_fetch, predicted_taken, 
-            false_prediction, pc_incremented, INT1_ADDRESS, jmp_register,
+            int_internal, pc_write_back, jz_fetch, jmp_fetch, rti_fetch, predicted_taken, 
+            false_prediction, pc_incremented, INT1_ADDRESS, RTI2_ADDRESS, jmp_register,
             pc_write_back_data, pc_transparent_out, pc_in
         );
 
