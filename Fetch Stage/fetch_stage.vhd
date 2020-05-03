@@ -39,7 +39,7 @@ ARCHITECTURE fetch_stage_arch OF fetch_stage IS
     SIGNAL pc_in, pc_transparent_in, forwarded_jmp_value, jmp_register : std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
     SIGNAL pc_out : std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0) := (others => '0');
         
-    SIGNAL int_internal, jz_fetch, jmp_fetch, is_two_word, is_int_executing, Fetch_Forwarding_Enable: std_logic;
+    SIGNAL int_internal, jz_fetch, jmp_fetch, int1_fetch, int2_fetch, is_two_word, is_int_executing, Fetch_Forwarding_Enable: std_logic;
     SIGNAL pc_incremented : std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
     SIGNAL op_code: std_logic_vector(0 TO 4);
 BEGIN
@@ -50,15 +50,13 @@ BEGIN
 
     op_code <= ir_fetch(2 TO 6);
 
-    branch_decoder: ENTITY work.branch_decoder PORT MAP (op_code, jmp_fetch, jz_fetch);   
+    branch_decoder: ENTITY work.branch_decoder PORT MAP (op_code, jmp_fetch, jz_fetch, int1_fetch, int2_fetch);   
     
     prediction_cache_key <= pc_out(PREDICTION_CACHE_KEY_SIZE-1 DOWNTO 0);
 
     is_two_word <= ir_fetch(0);
 
-    is_int_executing <= '1' WHEN pc_out = INT1_ADDRESS 
-                              or pc_out = std_logic_vector(unsigned(INT1_ADDRESS) + 1)
-                            ELSE '0';
+    is_int_executing <= int1_fetch or int2_fetch;
 
     jmp_register <= forwarded_jmp_value WHEN Fetch_Forwarding_Enable = '1' ELSE register_read_port3;
 
@@ -74,7 +72,7 @@ BEGIN
         PORT MAP(clk, '0', '0', pc_out, (OTHERS => 'Z'), ir_fetch); 
 
     pc_transparent : ENTITY work.RISING_EDGE_REG GENERIC MAP (SIZE => ADDRESS_SIZE)
-        PORT MAP(clk, rst, !is_int_executing, pc_transparent_in, pc_transparent_out);
+        PORT MAP(clk, rst, not int1_fetch, pc_transparent_in, pc_transparent_out);
 
     pc_controller : ENTITY work.pc_controller GENERIC MAP(ADDRESS_SIZE => ADDRESS_SIZE)
         PORT MAP(
