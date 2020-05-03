@@ -30,6 +30,8 @@ BEGIN
 			Op_Fetch_Forwarded <= (OTHERS => '0');
 			Fetch_Forwarding_Stall <= '0';
 		ELSE
+			Fetch_Forwarding_Enable <= '0';
+			Fetch_Forwarding_Stall <= '0';
 			IF (JZ_Fetch = '1' OR JMP_Fetch = '1') THEN       -- Instruction that Changes PC
 				IF (((WB1_DEC = '1') AND (SRC1_Fetch = DST1_DEC)) OR	       -- Decode Stage
 				    ((WB2_DEC = '1') AND (SRC1_Fetch = DST2_DEC)))   THEN 
