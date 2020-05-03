@@ -74,7 +74,7 @@ BEGIN
         PORT MAP(clk, '0', '0', pc_out, (OTHERS => 'Z'), ir_fetch); 
 
     pc_transparent : ENTITY work.RISING_EDGE_REG GENERIC MAP (SIZE => ADDRESS_SIZE)
-        PORT MAP(clk, rst, '1', pc_transparent_in, pc_transparent_out);
+        PORT MAP(clk, rst, !is_int_executing, pc_transparent_in, pc_transparent_out);
 
     pc_controller : ENTITY work.pc_controller GENERIC MAP(ADDRESS_SIZE => ADDRESS_SIZE)
         PORT MAP(
