@@ -72,7 +72,7 @@ BEGIN
 	MEM_Op1_MUX_Enable(0) <= (RD_EX AND NOT I_O_EX);
 	MEM_Op1_MUX  : ENTITY work.Mux GENERIC MAP (selection_line_width => 1, bus_width => 32) PORT MAP ('1', MEM_Op1_MUX_Enable, MEM_Op1_MUX_Input, Op1_EX_OUT);
 
-	Op2_EX_OUT <= Op2_EX;
+	Op2_EX_OUT <= ALU_Op2;
 	WB1_EX_OUT <= WB1_EX;
 	WB2_EX_OUT <= WB2_EX;
 	WR_EX_OUT <= WR_EX;
