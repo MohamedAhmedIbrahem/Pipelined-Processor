@@ -32,7 +32,8 @@ set NumericStdNoWarnings 0; list
 add wave -radix unsigned Fetch_Stage/pc_out
 add wave -radix unsigned Fetch_Stage/pc_in
 add wave Fetch_Stage/pc_enable
-add wave Fetch_Stage/RTI_Fetch
+add wave Fetch_Stage/RET_Fetch
+add wave Fetch_Stage/int_internal
 ############################
 
 ### Load instruction memory
@@ -74,4 +75,8 @@ force INT 0
 force Input_Port 2#0
 run 100
 force RST 0
-run 700
+run 1300
+force INT 1
+run 100
+force INT 0
+run 1000

@@ -51,7 +51,7 @@ BEGIN
     op_code <= ir_fetch(2 TO 6);
 
     branch_decoder: ENTITY work.branch_decoder 
-        PORT MAP (op_code, jmp_fetch, jz_fetch, int1_fetch, int2_fetch, rti_fetch);   
+        PORT MAP (op_code, jmp_fetch, jz_fetch, int1_fetch, int2_fetch, rti_fetch, ret_fetch);   
     
     prediction_cache_key <= pc_out(PREDICTION_CACHE_KEY_SIZE-1 DOWNTO 0);
 

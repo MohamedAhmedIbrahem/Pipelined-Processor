@@ -3,6 +3,7 @@
 
 ldm r2, 50
 call r2
+inc r5
 
 .org 50 
 inc r1 
