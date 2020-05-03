@@ -5,9 +5,9 @@ USE IEEE.NUMERIC_STD.all;
 ENTITY pc_controller IS
     GENERIC (ADDRESS_SIZE: integer := 32);
     PORT (
-        is_int_internal, pc_write_back, is_jz, is_jmp, predicted_taken, 
+        is_int_internal, pc_write_back, is_jz, is_jmp, is_rti, predicted_taken, 
             false_prediction: IN std_logic;
-        pc_incremented, int1_address, jmp_register, pc_write_back_data, 
+        pc_incremented, int1_address, rti2_address, jmp_register, pc_write_back_data, 
             pc_transparent: IN std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
         new_pc: OUT std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0)
     );
@@ -19,6 +19,8 @@ BEGIN
     BEGIN
         IF (is_int_internal = '1') THEN
             new_pc <= int1_address;
+        ELSIF (is_rti = '1') THEN
+            new_pc <= rti2_address;
         ELSIF (pc_write_back = '1') THEN
             new_pc <= pc_write_back_data;
         ELSIF (false_prediction = '1') THEN
