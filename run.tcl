@@ -32,6 +32,7 @@ set NumericStdNoWarnings 0; list
 add wave -radix unsigned Fetch_Stage/pc_out
 add wave -radix unsigned Fetch_Stage/pc_in
 add wave Fetch_Stage/pc_enable
+add wave Fetch_Stage/RTI_Fetch
 ############################
 
 ### Load instruction memory

@@ -40,7 +40,7 @@ class Assembler():
                         "call": "11110",
                         "out" : "11111",
                         "ret" : "01101",
-                        "rti" : "01100"}
+                        "rti" : "01110"}
         
         self.groupB = { "shl" : "00001",
                         "shr" : "00010"}
