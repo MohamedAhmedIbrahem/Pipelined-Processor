@@ -1,9 +1,14 @@
 .Rst 0
 .INt 100
 
-inc r3
-inc r5 
-jmp r4
+ldm r2, 50
+call r2
+
+.org 50 
+inc r1 
+inc r2
+RET
+
 
 .org 100
 inc r1

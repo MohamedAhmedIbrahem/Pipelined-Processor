@@ -74,7 +74,4 @@ force INT 0
 force Input_Port 2#0
 run 100
 force RST 0
-run 5100
-force INT 1
-run 100
-force INT 0
+run 700
