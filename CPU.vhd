@@ -82,7 +82,7 @@ Decode_Stage : ENTITY work.Decode_Stage PORT MAP (CLK, RST, IR_HIGH_DEC_IN, IR_L
 				   		  FLAGS_UPD_DEC_OUT, WB1_DEC_OUT, WB2_DEC_OUT, WR_DEC_OUT, RD_DEC_OUT,
 				   		  I_O_DEC_OUT, PCWB_DEC_OUT, FLAGSWB_DEC_OUT, SRC1_DEC_OUT, SRC2_DEC_OUT,
 	        		   		  IS_SRC1_DEC_OUT, IS_SRC2_DEC_OUT, DST1_DEC_OUT, DST2_DEC_OUT, JZ_DEC_OUT,  
-	        		   		  WB1_WB, WB2_WB, DST1_WB, DST2_WB, Op1_WB, Op2_WB, IR_FETCH(10 TO 12), Port3_DEC_OUT);
+	        		   		  WB1_WB, WB2_WB, DST1_WB, DST2_WB, Op1_WB, Op2_WB, IR_FETCH(7 TO 9), Port3_DEC_OUT);
 
 ---------------------------------------------- Decode/Execute Buffer ------------------------------------------------------
 DC_EX_BUFFER : ENTITY work.DC_EX_BUFFER PORT MAP (CLK, RST, (NOT EX_Forwarding_Stall),                                     						

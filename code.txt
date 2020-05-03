@@ -1,14 +1,44 @@
 .Rst 0
 .INt 100
 
+inc r3
+inc r5 
+jmp r4
 
+.org 100
+inc r1
+inc r2
+RTI
 
-ldm r5, 5
-IADD r1,r5,15 
-swap r5,r1
-shr r5, 2
-shl r5, 3
+;ldm r1, 5
+;ldm r2, 7
+;ldm r3, 15
+;ldm r4, 11
+;ldm r5, 1
+;ldm r6, 2
+;std r1, 10
+;std r2, 12
+;std r3, 14
+;std r4, 16
+;std r5, 18
+;std r6, 20
 
+;ldm r0, 6      ;Size
+;ldd r1, 10 
+;ldd  
+
+;ldm r5, 100
+;ldm r4, 103
+;ldm r2, 5
+;call r5
+;inc r5
+;dec r5
+
+;.org 100
+;dec r2
+;jz r4
+;jmp r5
+;RET
 
 ;add r3, r1, r1
 ;std r3, 10

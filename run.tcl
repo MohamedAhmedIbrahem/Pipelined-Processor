@@ -16,8 +16,8 @@ if {[catch { exec python Assembler/assembler.py $code_file_path $code_ram_file_p
 ### Initialize simulation
 vsim CPU  
 add wave -unsigned *
-#add wave -unsigned CPU/Fetch_Stage/fetch_forwarding_unit/*
-add wave -unsigned CPU/Execute_Stage/EX_FORW_UNIT/*
+add wave -unsigned CPU/Fetch_Stage/fetch_forwarding_unit/*
+#add wave -unsigned CPU/Execute_Stage/EX_FORW_UNIT/*
 add wave -unsigned $instruction_memory_sim_path/memory   
 add wave -unsigned $data_memory_sim_path/Mem
 #add wave -unsigned $data_memory_sim_path/*
@@ -39,10 +39,10 @@ add wave Fetch_Stage/pc_enable
 set instruction_memory_size [examine -unsigned $instruction_memory_sim_path/MEMORY_SIZE]; list
 set start_address [examine -unsigned Fetch_Stage/INTERNAL_INSTRUCTIONS_START_ADDRESS]; list
 set internal_instructions {
-    1000000000000010
-    0100011000000000
+    0000011000000000
     0000111000000000
-    0001111000000000
+	1000000000000010
+    0101111000000000
     0001101000000000
     1000000000000000
     0110000000000000
@@ -73,4 +73,7 @@ force INT 0
 force Input_Port 2#0
 run 100
 force RST 0
-run 600
+run 5100
+force INT 1
+run 100
+force INT 0
