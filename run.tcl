@@ -12,14 +12,15 @@ if {[catch { exec python Assembler/assembler.py $code_file_path $code_ram_file_p
     exec python3 Assembler/assembler.py $code_file_path $code_ram_file_path $data_ram_file_path
 }
 
+
 ### Initialize simulation
 vsim CPU  
 add wave -unsigned *
-add wave -unsigned CPU/Fetch_Stage/fetch_forwarding_unit/*
-add wave -unsigned CPU/Execute_Stage/EX_FORW_UNIT/*
-add wave -unsigned $instruction_memory_sim_path/memory
+#add wave -unsigned CPU/Fetch_Stage/fetch_forwarding_unit/*
+#add wave -unsigned CPU/Execute_Stage/EX_FORW_UNIT/*
+add wave -unsigned $instruction_memory_sim_path/memory   
 add wave -unsigned $data_memory_sim_path/Mem
-add wave -unsigned $data_memory_sim_path/*
+#add wave -unsigned $data_memory_sim_path/*
 add wave -unsigned Decode_Stage/registers/Register_File
 
 # Remove numeric std warnings before initialization

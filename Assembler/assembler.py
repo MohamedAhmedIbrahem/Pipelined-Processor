@@ -81,6 +81,10 @@ class Assembler():
                     ir = "00" + self.groupA[words[0]]
                     for i in range(1,len(words)):
                         ir += self.registers[words[i]]
+
+                    if words[0] == "swap":
+                        ir += self.registers[words[len(words)-1]]
+                        
                     ir += ('0' * (16-len(ir)))
                     #print("GroupA",ir,len(ir))
                     return ir,1
