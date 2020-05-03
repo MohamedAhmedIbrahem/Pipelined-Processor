@@ -2,10 +2,7 @@
 .INt 100
 
 ldm r5, 5
-inc r1
-jz r5
-inc r1 
-inc r6
+IADD r1,r2,15 
 
 ;add r3, r1, r1
 ;std r3, 10
