@@ -39,7 +39,7 @@ ARCHITECTURE fetch_stage_arch OF fetch_stage IS
     SIGNAL pc_in, pc_transparent_in, forwarded_jmp_value, jmp_register : std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
     SIGNAL pc_out : std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0) := (others => '0');
         
-    SIGNAL int_internal, jz_fetch, jmp_fetch, int1_fetch, int2_fetch, rti_fetch, is_two_word, is_int_executing, Fetch_Forwarding_Enable: std_logic;
+    SIGNAL int_internal, jz_fetch, jmp_fetch, int1_fetch, int2_fetch, rti_fetch, ret_fetch, is_two_word, is_int_executing, Fetch_Forwarding_Enable: std_logic;
     SIGNAL pc_incremented : std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
     SIGNAL op_code: std_logic_vector(0 TO 4);
 BEGIN
@@ -91,8 +91,8 @@ BEGIN
 
     interrupt_controller : ENTITY work.interrupt_controller
         PORT MAP(
-            clk, rst, int_external, jmp_fetch, jz_fetch, jz_decode, is_int_executing, 
-            bubble_pc_write_back, is_two_word, int_internal
+            clk, rst, int_external, jmp_fetch, jz_fetch, jz_decode, ret_fetch, rti_fetch,
+            is_int_executing, bubble_pc_write_back, is_two_word, int_internal
         );
 
     fetch_forwarding_unit : ENTITY work.Fetch_Forwarding_Unit
