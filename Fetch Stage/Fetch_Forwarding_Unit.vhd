@@ -49,9 +49,9 @@ BEGIN
 						Fetch_Forwarding_Stall <= '1';
 					ELSE
 						Fetch_Forwarding_Enable <= '1';			-- ALU Instruction
-						IF (WB1_MEM = '1') THEN
+						IF (WB1_MEM = '1' AND (SRC1_Fetch = DST1_MEM)) THEN
 							Op_Fetch_Forwarded <= Op1_MEM;
-						ELSIF (WB2_MEM = '1') THEN
+						ELSIF (WB2_MEM = '1' AND (SRC1_Fetch = DST2_MEM)) THEN
 							Op_Fetch_Forwarded <= Op2_MEM;
 						END IF;
 					END IF;

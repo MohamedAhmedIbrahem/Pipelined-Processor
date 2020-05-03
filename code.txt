@@ -1,9 +1,14 @@
 .Rst 0
 .INt 100
 
+
+
 ldm r5, 5
 IADD r1,r5,15 
 swap r5,r1
+shr r5, 2
+shl r5, 3
+
 
 ;add r3, r1, r1
 ;std r3, 10

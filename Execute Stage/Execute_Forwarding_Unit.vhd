@@ -43,9 +43,9 @@ BEGIN
 					EX_Forwarding_Stall <= '1';
 				ELSE -- ALU Instruction
 					Op1_EX_Forwarding_Enable <= '1';
-					IF (WB1_MEM = '1') THEN
+					IF (WB1_MEM = '1' AND (SRC1_EX = DST1_MEM)) THEN
 						Op1_EX_Forwarded <= Op1_MEM;
-					ELSIF (WB2_MEM = '1') THEN
+					ELSIF (WB2_MEM = '1' AND (SRC1_EX = DST2_MEM)) THEN
 						Op1_EX_Forwarded <= Op2_MEM;
 					END IF;
 				END IF;
@@ -53,9 +53,9 @@ BEGIN
 			      (SRC1_EX = DST1_WB)) OR ((WB2_WB = '1') AND (SRC1_EX = DST2_WB))) THEN -- Write Back Stage	
 	
 				Op1_EX_Forwarding_Enable <= '1';
-				IF WB1_WB THEN
+				IF (WB1_WB = '1' AND (SRC1_EX = DST1_WB))THEN
 					Op1_EX_Forwarded <= Op1_WB;
-				ELSIF WB2_WB THEN
+				ELSIF (WB2_WB = '1' AND (SRC1_EX = DST2_WB)) THEN
 					Op1_EX_Forwarded <= Op2_WB;
 				END IF;
 			END IF;
@@ -67,9 +67,9 @@ BEGIN
 					EX_Forwarding_Stall <= '1';
 				ELSE
 					Op2_EX_Forwarding_Enable <= '1';
-					IF (WB1_MEM = '1') THEN
+					IF ((WB1_MEM = '1') AND (SRC2_EX = DST1_MEM)) THEN
 						Op2_EX_Forwarded <= Op1_MEM;
-					ELSIF (WB2_MEM = '1') THEN
+					ELSIF ((WB2_MEM = '1') AND (SRC2_EX = DST2_MEM)) THEN
 						Op2_EX_Forwarded <= Op2_MEM;
 					END IF;
 				END IF;
@@ -77,9 +77,9 @@ BEGIN
 			      (SRC2_EX = DST1_WB)) OR ((WB2_WB = '1') AND (SRC2_EX = DST2_WB))) THEN -- Write Back Stage	
 
 				Op2_EX_Forwarding_Enable <= '1';
-				IF (WB1_WB = '1') THEN
+				IF (WB1_WB = '1' AND (SRC2_EX = DST1_WB)) THEN
 					Op2_EX_Forwarded <= Op1_WB;
-				ELSIF (WB2_WB = '1') THEN
+				ELSIF (WB2_WB = '1' AND (SRC2_EX = DST2_WB)) THEN
 					Op2_EX_Forwarded <= Op2_WB;
 				END IF;
 			END IF;
