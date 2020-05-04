@@ -72,11 +72,8 @@ mem load -filldata $ram_contents $data_memory_sim_path/Mem -endaddress $end_addr
 force CLK 1 0, 0 50 -r 100
 force RST 1
 force INT 0
-force Input_Port 2#0
+force Input_Port 10#17
 run 100
 force RST 0
-run 1300
-force INT 1
-run 100
-force INT 0
-run 1000
+run 2000
+

@@ -1,20 +1,9 @@
 .Rst 0
 .INt 100
 
-ldm r2, 50
-call r2
-inc r5
 
-.org 50 
-inc r1 
-inc r2
-RET
+in r1
 
-
-.org 100
-inc r1
-inc r2
-RTI
 
 ;ldm r1, 5
 ;ldm r2, 7
