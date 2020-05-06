@@ -18,8 +18,8 @@ ENTITY instruction_cache IS
         data_out : OUT std_logic_vector(word_size - 1 DOWNTO 0);
         force_wr : IN std_logic;
         controller_address : IN std_logic_vector(address_width - 1 DOWNTO 0);
-        controller_data_in : IN std_logic_vector(word_size - 1 DOWNTO 0);
-        controller_data_out : OUT std_logic_vector(word_size - 1 DOWNTO 0);
+        controller_data_in : IN std_logic_vector(0 TO words_number_in_block * word_size - 1);
+        controller_data_out : OUT std_logic_vector(0 TO words_number_in_block * word_size - 1);
         hit : OUT std_logic;
         valid : OUT std_logic;
         dirty : OUT std_logic
@@ -41,12 +41,11 @@ ARCHITECTURE instruction_cache_operation OF instruction_cache IS
     CONSTANT zero_entry : entry := (tag => (OTHERS => '0'), valid => '0', dirty => '0', words => (OTHERS => (OTHERS => '0')));
     TYPE cache_type IS ARRAY(0 TO entries - 1) OF entry;
     SIGNAL cache : cache_type;
-    SIGNAL controller_word_offset, word_offset : INTEGER := 0;
+    SIGNAL word_offset : INTEGER := 0;
     SIGNAL controller_index, index : INTEGER := 0;
     SIGNAL controller_tag, tag : std_logic_vector(tag_size - 1 DOWNTO 0);
 BEGIN
     word_offset <= to_integer(unsigned(address(word_offset_size - 1 DOWNTO 0)));
-    controller_word_offset <= to_integer(unsigned(controller_address(word_offset_size - 1 DOWNTO 0)));
 
     index <= to_integer(unsigned(address(word_offset_size + index_size - 1 DOWNTO word_offset_size)));
     controller_index <= to_integer(unsigned(controller_address(word_offset_size + index_size - 1 DOWNTO word_offset_size)));
@@ -55,7 +54,9 @@ BEGIN
     controller_tag <= controller_address(word_offset_size + index_size + tag_size - 1 DOWNTO word_offset_size + index_size);
 
     data_out <= cache(index).words(word_offset);
-    controller_data_out <= cache(controller_index).words(controller_word_offset);
+    controller_data_out_generate : FOR I IN 0 TO words_number_in_block - 1 GENERATE
+        controller_data_out(I * word_size TO (I + 1) * word_size - 1) <= cache(controller_index).words(I);
+    END GENERATE controller_data_out_generate;
 
     hit <= '1' WHEN (cache(index).valid = '1') AND (cache(index).tag = tag) ELSE '0';
     dirty <= cache(index).dirty;
@@ -68,7 +69,9 @@ BEGIN
                 cache <= (OTHERS => zero_entry);
             ELSIF force_wr = '1' THEN
                 cache(controller_index).tag <= controller_tag;
-                cache(controller_index).words(controller_word_offset) <= controller_data_in(word_size - 1 DOWNTO 0);
+                FOR I IN 0 TO words_number_in_block - 1 LOOP
+                    cache(controller_index).words(I) <= controller_data_in(I * word_size TO (I + 1) * word_size - 1);
+                END LOOP;
                 cache(controller_index).dirty <= '0';
                 cache(controller_index).valid <= '1';
             ELSIF (wr = '1') AND (hit = '1') THEN
