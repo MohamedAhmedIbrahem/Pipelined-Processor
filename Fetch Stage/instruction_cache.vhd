@@ -21,6 +21,7 @@ ENTITY instruction_cache IS
         controller_data_in : IN std_logic_vector(word_size - 1 DOWNTO 0);
         controller_data_out : OUT std_logic_vector(word_size - 1 DOWNTO 0);
         hit : OUT std_logic;
+        valid : OUT std_logic;
         dirty : OUT std_logic
     );
 END instruction_cache;
@@ -58,6 +59,7 @@ BEGIN
 
     hit <= '1' WHEN (cache(index).valid = '1') AND (cache(index).tag = tag) ELSE '0';
     dirty <= cache(index).dirty;
+    valid <= cache(index).valid;
 
     PROCESS (clk)
     BEGIN
