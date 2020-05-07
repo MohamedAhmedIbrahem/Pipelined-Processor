@@ -1,7 +1,7 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
-USE IEEE.NUMERIC_STD.ALL;
 
+-- TODO remove extra cycle on miss conflicts
 ENTITY memory_controller IS
     PORT (
         clk, rst, data_write: IN std_logic;
@@ -20,8 +20,6 @@ ARCHITECTURE memory_controller_arch OF memory_controller IS
     );
     constant initial_state: states := IDLE;
     signal current_state: states := initial_state;
-    signal data_word_out: std_logic_vector (31 DOWNTO 0);
-    signal instruction_word_out : std_logic_vector (15 DOWNTO 0);
     signal instruction_block_write, data_block_write: std_logic;
     signal instruction_hit, instruction_dirty, instruction_valid: std_logic;
     signal data_hit, data_dirty, data_valid: std_logic;
@@ -30,18 +28,17 @@ ARCHITECTURE memory_controller_arch OF memory_controller IS
     signal memory_data_in, memory_data_out : std_logic_vector(127 DOWNTO 0);
     signal start_read_data_block, start_read_code_block, start_write_data_block : std_logic;
     signal data_current_tag : std_logic_vector(2 DOWNTO 0);
-    signal data_word_offset, instruction_word_offset : integer;
 BEGIN
     instruction_cache: ENTITY work.instruction_cache 
     PORT MAP (
-        clk, rst, '0', instruction_address, (OTHERS => 'Z'), instruction_word_out,
+        clk, rst, '0', instruction_address, (OTHERS => 'Z'), instruction_out,
         instruction_block_write, memory_address, memory_data_out,
         open, instruction_hit, instruction_valid, instruction_dirty
     );
 
     data_cache: ENTITY work.data_cache
     PORT MAP (
-        clk, rst, data_write, data_address, data_in, data_word_out, data_block_write,
+        clk, rst, data_write, data_address, data_in, data_out, data_block_write,
         memory_address, memory_data_out, memory_data_in, data_hit, data_valid, data_dirty, data_current_tag
     );
 
@@ -60,19 +57,8 @@ BEGIN
     instruction_block_write <= '1' WHEN current_state = READ_CODE_BLOCK and memory_done = '1' 
                                   ELSE '0';
     
-    -- TODO remove extra cycle on miss conflicts
-    data_ready <= '1' WHEN (current_state = IDLE and data_hit = '1') or 
-                           (current_state = READ_DATA_BLOCK and memory_done = '1') ELSE '0';
-    instruction_ready <= '1' WHEN (current_state = IDLE and instruction_hit = '1') or 
-                                  (current_state = READ_CODE_BLOCK and memory_done = '1') ELSE '0';
-    
-    data_word_offset <= to_integer(unsigned(data_address(2 DOWNTO 0)));
-    data_out <= data_word_out WHEN current_state = IDLE
-                ELSE memory_data_out(128-(instruction_word_offset)*16-1 DOWNTO 128-(instruction_word_offset+2)*16);
-
-    instruction_word_offset <= to_integer(unsigned(instruction_address(2 DOWNTO 0)));
-    instruction_out <= instruction_word_out WHEN current_state = IDLE
-                       ELSE memory_data_out(128-(instruction_word_offset)*16-1 DOWNTO 128-(instruction_word_offset+1)*16);
+    data_ready <= '1' WHEN current_state = IDLE and data_hit = '1' ELSE '0';
+    instruction_ready <= '1' WHEN current_state = IDLE and instruction_hit = '1' ELSE '0';
 
     -- memory inputs process
     PROCESS (ALL)
