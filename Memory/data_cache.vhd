@@ -22,7 +22,8 @@ ENTITY data_cache IS
         controller_data_out : OUT std_logic_vector(0 TO words_number_in_block * word_size - 1);
         hit : OUT std_logic;
         valid : OUT std_logic;
-        dirty : OUT std_logic
+        dirty : OUT std_logic;
+        current_tag : OUT std_logic_vector(2 DOWNTO 0)
     );
 END data_cache;
 
@@ -61,6 +62,7 @@ BEGIN
     hit <= '1' WHEN (cache(index).valid = '1') AND (cache(index).tag = tag) ELSE '0';
     valid <= cache(index).valid;
     dirty <= cache(index).dirty;
+    current_tag <= cache(index).tag;
 
     PROCESS (clk)
     BEGIN
