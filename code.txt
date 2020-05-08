@@ -1,87 +1,21 @@
-.rst 
+.org 0 
 10
-.int 2
+.org 2
 100
 
 
 .org 10
 inc r1
+ldm r2, A
+add r3, r1, r2
+std r3, 100
+ldm r4, F
+ldd r1, 100
+sub r7, r4, r3
+dec r7
+shr r7, 2
+ldm r4, 200
+jmp r4
 
-
-;ldm r1, 5
-;ldm r2, 7
-;ldm r3, 15
-;ldm r4, 11
-;ldm r5, 1
-;ldm r6, 2
-;std r1, 10
-;std r2, 12
-;std r3, 14
-;std r4, 16
-;std r5, 18
-;std r6, 20
-
-;ldm r0, 6      ;Size
-;ldd r1, 10 
-;ldd  
-
-;ldm r5, 100
-;ldm r4, 103
-;ldm r2, 5
-;call r5
-;inc r5
-;dec r5
-
-;.org 100
-;dec r2
-;jz r4
-;jmp r5
-;RET
-
-;add r3, r1, r1
-;std r3, 10
-;ldd r4, 10
-;Add r5, r4, r4
-;dec r3
-;push r3
-;pop r7
-;swap r1, r3 b 
- 
-;this is comment 
-;.Org 8
-
-;inc r1
-;dec r2
-;not r1
-;out r1
-;in r3
-;swap r1,r3 ;this is swap
-;add r1,r2,r3
-;add r1,r2,r3
-
-;.oRG 25
-;IADD r1,r2,15
-
-;sub r1,r2,r3
-
-;ANd r1,r2,r3 
-;shl r1,15
-;shr r2,20
-
-;push r1 
-
-;pop r2 
-
-;ldm r4,200 
-;ldd r4,1
-;std r1,200
-
-;jz r1
-;jmp r6
-;nop
-;nop 
-;nop 
-;nop
-;call r7
-;ret
-;rti
+.org 200
+ldm r5, AF

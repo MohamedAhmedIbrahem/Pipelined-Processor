@@ -1,13 +1,14 @@
 #!/usr/bin/tclsh
 
 ### Parameters
+set code_file_path "code.txt"; list
 set memory_file_path "ram.txt"; list
 set memory_sim_path "CPU/memory_controller/main_memory/Mem"; list
 
 ### Run the assembler to generate ram contents
-# if {[catch { exec python Assembler/assembler.py $code_file_path $code_ram_file_path $memory_file_path }]} {
-#     exec python3 Assembler/assembler.py $code_file_path $code_ram_file_path $memory_file_path
-# }
+if {[catch { exec python Assembler/assembler.py $code_file_path $memory_file_path }]} {
+    exec python3 Assembler/assembler.py $code_file_path $memory_file_path
+}
 
 
 ### Initialize simulation
@@ -32,23 +33,9 @@ add wave Fetch_Stage/pc_enable
 add wave Fetch_Stage/instruction_read
 add wave Fetch_Stage/RET_Fetch
 add wave Fetch_Stage/int_internal
-
+add wave Execute_Stage/*
 ############################
 
-### Load instruction memory
-# Load internal instructions
-# set instruction_memory_size [examine -unsigned $instruction_memory_sim_path/MEMORY_SIZE]; list
-# set start_address [examine -unsigned Fetch_Stage/INTERNAL_INSTRUCTIONS_START_ADDRESS]; list
-# set internal_instructions {
-#     0000011000000000
-#     0000111000000000
-# 	1000000000000010
-#     0101111000000000
-#     0001101000000000
-#     1000000000000000
-#     0110000000000000
-# }; list
-# mem load -filldata $internal_instructions $instruction_memory_sim_path/memory -startaddress $start_address
 
 ### Load data memory
 set ram_contents_file [open $memory_file_path]; list

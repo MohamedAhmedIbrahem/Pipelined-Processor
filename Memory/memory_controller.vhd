@@ -68,11 +68,14 @@ BEGIN
         memory_address <= (OTHERS => '0');
         IF current_state = IDLE and start_write_data_block = '1' THEN
             memory_write <= '1';
+            memory_address <= data_current_tag & data_address(7 DOWNTO 3) & "000";
         ELSIF (current_state = IDLE and start_read_data_block = '1') or 
             (current_state = WRITE_DATA_BLOCK and memory_done = '1') THEN
             memory_read <= '1';
+            memory_address <= data_address(10 DOWNTO 3) & "000";
         ELSIF current_state = IDLE and start_read_code_block = '1' THEN
             memory_read <= '1';
+            memory_address <= instruction_address(10 DOWNTO 3) & "000";
         ELSIF current_state = WRITE_DATA_BLOCK THEN
             memory_address <= data_current_tag & data_address(7 DOWNTO 3) & "000";
         ELSIF current_state = READ_DATA_BLOCK THEN

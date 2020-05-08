@@ -78,7 +78,7 @@ Fetch_Stage : ENTITY work.Fetch_Stage GENERIC MAP (16, 32, 4) PORT MAP (CLK, RST
 								       PC_KEY_FETCH, PC_Transparent, instruction_out, IR_FETCH, pc_out, instruction_read);
 
 ---------------------------------------------- Fetch/Decode Buffer -----------------------------------------------------
-FETCH_DC_BUFFER : ENTITY work.FETCH_DC_BUFFER PORT MAP (CLK, RST OR fetch_stall, 
+FETCH_DC_BUFFER : ENTITY work.FETCH_DC_BUFFER PORT MAP (CLK, RST OR (fetch_stall AND NOT memory_stall), 
 					               NOT (memory_stall or EX_Forwarding_Stall), NOT (EX_Forwarding_Stall OR (NOT IR_FETCH(0) AND IR_FETCH(1)) OR memory_stall),  
         				  	       P_TAKEN_FETCH, P_TAKEN_DEC_IN, PC_KEY_FETCH, PC_KEY_DEC_IN,
 	    				               IR_FETCH, IR_HIGH_DEC_IN, IR_LOW_DEC_IN);
@@ -131,7 +131,7 @@ MEM_WB_BUFFER : ENTITY work.MEM_WB_BUFFER PORT MAP (CLK, RST or memory_stall, '1
 memory_controller : ENTITY work.memory_controller
     PORT MAP (
         clk, rst, data_write, instruction_read, data_read,
-        pc_out(10 DOWNTO 0), data_address, data_in, data_out,
+        pc_out(10 DOWNTO 0), data_address AND (data_read or data_write), data_in, data_out,
         instruction_out, data_ready, instruction_ready
     );
 

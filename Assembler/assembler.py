@@ -186,8 +186,8 @@ class Assembler():
                     if valid == False or number[0] == '1':
                         print("invalid address in line "+str(self.code_lines[i][1]) + " !")
                         break
-                    self.binary_code[self.current_code_mem_location]   = number[16:]
-                    self.binary_code[self.current_code_mem_location+1] = number[:16]
+                    self.binary_code[self.current_code_mem_location]   = number[:16]
+                    self.binary_code[self.current_code_mem_location+1] = number[16:]
                     continue
                 except:
                     pass

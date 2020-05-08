@@ -34,7 +34,7 @@ ARCHITECTURE Execute_Stage_Arch OF Execute_Stage IS
 	SIGNAL MEM_Op1_MUX_Input: bus_array(1 DOWNTO 0)(31 DOWNTO 0);
 	SIGNAL Flags_WR_MUX_Input: bus_array(1 DOWNTO 0)(3 DOWNTO 0);
 	SIGNAL Flags_RD_MUX_Input: bus_array(1 DOWNTO 0)(3 DOWNTO 0);
-	SIGNAL Op1_Forwarding_Enable, Op2_Forwarding_Enable, Forwarding_Stall : STD_LOGIC_VECTOR(0 DOWNTO 0);
+	SIGNAL Op1_Forwarding_Enable, Op2_Forwarding_Enable : STD_LOGIC_VECTOR(0 DOWNTO 0);
 	SIGNAL Op1_Forwarded, Op2_Forwarded : STD_LOGIC_VECTOR(31 DOWNTO 0);
 	SIGNAL ALU_Op1, ALU_Op2, ALU_Result : STD_LOGIC_VECTOR(31 DOWNTO 0);
 	SIGNAL ALU_Flags, WB_Flags, Flags_WR_MUX_OUT, Flags_Register : STD_LOGIC_VECTOR(3 DOWNTO 0);
