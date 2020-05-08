@@ -27,11 +27,13 @@ BEGIN
 		IF RISING_EDGE(CLK) THEN
 			RDCounter := RCounter;
 			WRCounter := WCounter;
+			
 			IF WR='1' THEN
 				WRCounter := 0;
 			ELSIF RD='1' THEN
 				RDCounter := 0;
 			END IF;
+			
 			IF WRCounter /= -1 THEN
 				Mem(TO_INTEGER(UNSIGNED(Address) + 2*WRCounter)) 	 <= Din((8-2*WRCounter)*CellSize-1 DOWNTO (8-2*WRCounter-1)*CellSize);
 				Mem(TO_INTEGER(UNSIGNED(Address) + 2*WRCounter + 1)) <= Din((8-2*WRCounter-1)*CellSize-1 DOWNTO (8-2*WRCounter-2)*CellSize);
@@ -53,4 +55,3 @@ BEGIN
 		END IF;
     END PROCESS;
 END ARCHITECTURE arch_RAM;
---11111111111111110000000000000000111111111111111100000000000000001111111111111111000000000000000011111111111111110000000000000000
