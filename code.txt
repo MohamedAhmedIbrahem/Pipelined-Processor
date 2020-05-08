@@ -1,8 +1,11 @@
-.Rst 0
-.INt 100
+.rst 
+10
+.int 2
+100
 
 
-in r1
+.org 10
+inc r1
 
 
 ;ldm r1, 5

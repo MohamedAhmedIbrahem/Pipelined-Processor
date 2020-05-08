@@ -20,35 +20,50 @@ ENTITY fetch_stage IS
         -- Forwarding unit signals END
         predicted_taken, false_prediction: OUT std_logic;
         prediction_cache_key: OUT std_logic_vector(PREDICTION_CACHE_KEY_SIZE-1 DOWNTO 0);
-	pc_transparent_out: OUT std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
-        ir_fetch : OUT std_logic_vector(0 TO INSTRUCTION_WORD_SIZE-1)
+        pc_transparent_out: OUT std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
+        instruction_memory_out: IN std_logic_vector(0 TO INSTRUCTION_WORD_SIZE-1);
+        ir_fetch : OUT std_logic_vector(0 TO INSTRUCTION_WORD_SIZE-1);
+        pc_out : OUT std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
+        instruction_read: OUT std_logic
     );
 END;
 
 ARCHITECTURE fetch_stage_arch OF fetch_stage IS
-    CONSTANT INSTRUCTION_MEMORY_SIZE : integer := 200;
-    CONSTANT INTERNAL_INSTRUCTIONS_START_ADDRESS : integer := INSTRUCTION_MEMORY_SIZE - 8;
-    -- Constant JUMP addresses --
-    CONSTANT RST_ADDRESS: std_logic_vector := std_logic_vector(
-                            to_unsigned(INTERNAL_INSTRUCTIONS_START_ADDRESS + 5, ADDRESS_SIZE));
-    CONSTANT RTI2_ADDRESS: std_logic_vector := std_logic_vector(
-                            to_unsigned(INTERNAL_INSTRUCTIONS_START_ADDRESS + 4, ADDRESS_SIZE));
-    CONSTANT INT1_ADDRESS : std_logic_vector := std_logic_vector(
-                            to_unsigned(INTERNAL_INSTRUCTIONS_START_ADDRESS, ADDRESS_SIZE));
+    -- Internal instructions addresses addresses --
+    CONSTANT INT1_ADDRESS : std_logic_vector := "10000000000000000000000000000000";
+    CONSTANT RET_ADDRESS: std_logic_vector := "10000000000000000000000000000100";
+    CONSTANT RST_ADDRESS: std_logic_vector := "10000000000000000000000000000101";
+
+    TYPE ROM IS ARRAY(0 TO 7) OF STD_LOGIC_VECTOR(INSTRUCTION_WORD_SIZE-1 DOWNTO 0);
+    SIGNAL internal_instructions : ROM := (
+        0 => "0000011000000000",
+        1 => "0000111000000000",
+        2 => "1000000000000010",
+        3 => "0101111000000000",
+        4 => "0001101000000000",
+        5 => "1000000000000000",
+        6 => "0110000000000000",
+        OTHERS => (OTHERS => '0')
+    );
 
     SIGNAL pc_in, pc_transparent_in, forwarded_jmp_value, jmp_register : std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
-    SIGNAL pc_out : std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0) := (others => '0');
         
     SIGNAL int_internal, jz_fetch, jmp_fetch, int1_fetch, int2_fetch, rti_fetch, ret_fetch, is_two_word, is_int_executing, Fetch_Forwarding_Enable: std_logic;
     SIGNAL pc_incremented : std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
     SIGNAL op_code: std_logic_vector(0 TO 4);
 BEGIN
+    instruction_read <= not pc_out(31);
+
+    ir_fetch <= instruction_memory_out WHEN instruction_read = '1' ELSE 
+                internal_instructions(to_integer(unsigned(pc_out(2 DOWNTO 0))));
+
     pc_transparent_in <= jmp_register WHEN (jz_fetch = '1' and predicted_taken = '0') 
                                       ELSE pc_incremented;
 
     pc_incremented <= std_logic_vector(unsigned(pc_out) + 1);
 
     op_code <= ir_fetch(2 TO 6);
+
 
     branch_decoder: ENTITY work.branch_decoder 
         PORT MAP (op_code, jmp_fetch, jz_fetch, int1_fetch, int2_fetch, rti_fetch, ret_fetch);   
@@ -64,21 +79,13 @@ BEGIN
     pc : ENTITY work.pc_register GENERIC MAP (ADDRESS_SIZE => ADDRESS_SIZE)
         PORT MAP(clk, rst, pc_enable, pc_in, RST_ADDRESS, pc_out);
 
-    instruction_memory : ENTITY work.instruction_memory 
-        GENERIC MAP (
-            WORD_SIZE => INSTRUCTION_WORD_SIZE, 
-            ADDRESS_SIZE => ADDRESS_SIZE, 
-            MEMORY_SIZE  => INSTRUCTION_MEMORY_SIZE
-        )
-        PORT MAP(clk, '0', '0', pc_out, (OTHERS => 'Z'), ir_fetch); 
-
     pc_transparent : ENTITY work.RISING_EDGE_REG GENERIC MAP (SIZE => ADDRESS_SIZE)
         PORT MAP(clk, rst, not int1_fetch, pc_transparent_in, pc_transparent_out);
 
     pc_controller : ENTITY work.pc_controller GENERIC MAP(ADDRESS_SIZE => ADDRESS_SIZE)
         PORT MAP(
             int_internal, pc_write_back, jz_fetch, jmp_fetch, rti_fetch, predicted_taken, 
-            false_prediction, pc_incremented, INT1_ADDRESS, RTI2_ADDRESS, jmp_register,
+            false_prediction, pc_incremented, INT1_ADDRESS, RET_ADDRESS, jmp_register,
             pc_write_back_data, pc_transparent_out, pc_in
         );
 

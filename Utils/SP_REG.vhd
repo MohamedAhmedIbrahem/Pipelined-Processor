@@ -18,6 +18,7 @@ BEGIN
         IF RISING_EDGE(CLK) THEN
             IF RST ='1' THEN
                 Dout <= (OTHERS => '1');
+                Dout(0) <= '0';
             ELSIF EN ='1' THEN
                 Dout <= Din;
             END IF;

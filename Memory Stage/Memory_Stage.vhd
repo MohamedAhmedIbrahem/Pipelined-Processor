@@ -14,20 +14,25 @@ ENTITY Memory_Stage IS
        	 	DST1_MEM_OUT, DST2_MEM_OUT                		: OUT STD_LOGIC_VECTOR(0 TO 2);	        -- Registers' Adresses
         	WB1_MEM_OUT, WB2_MEM_OUT, 
 		PCWB_MEM_OUT, FLAGSWB_MEM_OUT  				: OUT STD_LOGIC;                        -- Signals
-		Output_Port						: OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
-	     );
+		Output_Port						: OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
+		memory_data_out: IN std_logic_vector(31 DOWNTO 0);
+		data_write, data_read:	OUT std_logic;
+		memory_data_in: OUT std_logic_vector(31 DOWNTO 0);
+		memory_address: OUT std_logic_vector(10 DOWNTO 0)
+	    );
 END ENTITY;
 
 ARCHITECTURE Memory_Stage_Arch OF Memory_Stage IS
-
-	SIGNAL RAM_OUT : STD_LOGIC_VECTOR (31 DOWNTO 0);
 	SIGNAL WB_Op1_MUX_Input: bus_array(1 DOWNTO 0)(31 DOWNTO 0);
 	SIGNAL WB_Op1_MUX_Enable : STD_LOGIC_VECTOR(0 DOWNTO 0);
 BEGIN
-  	Data_Ram : ENTITY work.DATA_RAM GENERIC MAP(16, 32) PORT MAP(CLK, (WR_MEM AND I_O_MEM), (RD_MEM AND I_O_MEM), '0', Op2_MEM, Op1_MEM, RAM_OUT);
+	data_write <= WR_MEM AND I_O_MEM;
+	data_read <= RD_MEM AND I_O_MEM;
+	memory_address <= Op2_MEM(10 DOWNTO 0);
+	memory_data_in <= Op1_MEM;
 
 	WB_Op1_MUX_Input(0) <= Op1_MEM;
-	WB_Op1_MUX_Input(1) <= RAM_OUT;
+	WB_Op1_MUX_Input(1) <= memory_data_out;
 	WB_Op1_MUX_Enable(0) <= (RD_MEM AND I_O_MEM);
 	MEM_Op1_MUX  : ENTITY work.Mux GENERIC MAP (selection_line_width => 1, bus_width => 32) PORT MAP ('1', WB_Op1_MUX_Enable, WB_Op1_MUX_Input, Op1_MEM_OUT);
 
