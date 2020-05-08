@@ -2,10 +2,9 @@ import sys
 
 class Assembler():
 
-    def __init__(self, path, code_output_path,data_ram_path):
+    def __init__(self, path, code_output_path):
         self.path = path
         self.code_output_path = code_output_path
-        self.data_ram_path = data_ram_path
 
         self.registers = {'r0': '000',
                           'r1': '001', 
@@ -21,7 +20,6 @@ class Assembler():
         self.current_code_mem_location = 0
 
         self.binary_code = {}
-        self.data_ram = {}
 
         self.groupA = { "nop" : "00000",
                         "swap": "10001",
@@ -40,7 +38,7 @@ class Assembler():
                         "call": "11110",
                         "out" : "11111",
                         "ret" : "01101",
-                        "rti" : "01110"}
+                        "rti" : "01100"}
         
         self.groupB = { "shl" : "00001",
                         "shr" : "00010"}
@@ -56,11 +54,29 @@ class Assembler():
         self.TwoOperand = ["swap","shl","shr","ldm","ldd","std"]
         self.ThreeOperand = ["add","iadd","sub","and","or"]
         
+        self.hex_to_bin = {
+            '0' : "0000",
+            '1' : "0001",
+            '2' : "0010",
+            '3' : "0011",
+            '4' : "0100",
+            '5' : "0101",
+            '6' : "0110",
+            '7' : "0111",
+            '8' : "1000",
+            '9' : "1001",
+            'a' : "1010",
+            'b' : "1011",
+            'c' : "1100",
+            'd' : "1101",
+            'e' : "1110",
+            'f' : "1111"
+        }
+
     def parse(self):
         self.__read_code_file()     
         self.__scan_code()
         self.__save_instructions()
-        self.__save_data()
 
     def __get_instruction_info(self, line):
         words = []
@@ -89,65 +105,112 @@ class Assembler():
                     #print("GroupA",ir,len(ir))
                     return ir,1
                 elif words[0] in self.groupB.keys():    #shift
-                    ir = "00" + self.groupB[words[0]] + self.registers[words[1]] + bin(int(words[2])).replace("0b","").zfill(5) + "0"
+                    shift_value,valid = self.__parse_hex(words[2],5)
+                    if valid == False:                  #large shift value
+                        return '0',1
+                    ir = "00" + self.groupB[words[0]] + self.registers[words[1]] + shift_value + "0"
                     #print("GroupB",ir,len(ir))
                     return ir,1
                 elif words[0] in self.groupC.keys():    #immediate
                     if words[0] in self.TwoOperand:     #ldm
-                        immediate_value = bin(int(words[2])).replace("0b","").zfill(16)
+                        immediate_value,valid = self.__parse_hex(words[2],16)
+                        if valid == False:
+                            return '0',2
                         ir ="01" + self.groupC[words[0]] + self.registers[words[1]] + "00000" + immediate_value[0] + "1" + immediate_value[1:]
                     else:                               #iadd
-                        immediate_value = bin(int(words[3])).replace("0b","").zfill(16)
+                        immediate_value,valid = self.__parse_hex(words[3],16)
+                        if valid == False:
+                            return '0',2
                         ir ="01" + self.groupC[words[0]] + self.registers[words[1]] + self.registers[words[2]] + "00" + immediate_value[0] + "1" + immediate_value[1:]
                     #print("GroupC",ir,len(ir))
                     return ir,2
                 elif words[0] in self.groupD.keys():    #memory
-                    effective_address = bin(int(words[2])).replace("0b","").zfill(20)
+                    effective_address,valid = self.__parse_hex(words[2],20)
+                    if valid == False:
+                        return '0',2
                     ir = "01" + self.groupD[words[0]] + self.registers[words[1]] + "0" + effective_address[:5] + "1" + effective_address[5:]
                     #print("GroupD",ir,len(ir))
                     return ir,2
             except:
-                print("Invalid instruction Format!")
+                pass 
         return '0'*16,0
     def __read_code_file(self):
 
+        line_count = 0
         with open(self.path) as FILE:
             line = FILE.readline()
             while line:
+                line_count += 1
                 line = line.strip()
-                if len(line) != 0 and line[0] != ";" :  #if the line isn't empty or comment
+                if len(line) != 0 and line[0] != "#" :  #if the line isn't empty or comment
                     line = line.lower()
-                    line = line.split(";", 1)[0]        #remove the comment
-                    self.code_lines.append(line.strip())
+                    line = line.split("#", 1)[0]        #remove the comment
+                    self.code_lines.append([line.strip(),line_count])
                 line = FILE.readline()
+
+    def __parse_hex(self,number,length):
+        while len(number)*4 < length:   #complete the number
+            number = "0" + number
+
+        number = number[::-1]
+        ret = ""
+        for i in range(len(number)-1,-1,-1):
+            ret += self.hex_to_bin[number[i]]
+
+        if length == 5:
+            return ret[3:],ret[:3] == "000"
+
+        sign = ret[0]
+        while len(ret) < length:
+            ret = sign + ret
+        
+        return ret,len(ret) == length
+
+    def __unsigned_bin_to_dec(self,number):
+        ret = 0
+        for i in range(len(number)):
+            digit = number[len(number)-i-1]
+            if digit == '1':
+                ret += pow(2,i)
+        return ret
 
     # Scan the code to get instructions.
     def __scan_code(self):
-
         for i in range(len(self.code_lines)):
-            line = self.code_lines[i]
+            line = self.code_lines[i][0]
             line_words = line.split(" ", 1)
 
-            if len(line_words) == 2 and (line_words[0][:4] == '.rst' or line_words[0][:4] == '.int'):
-                if line_words[1].strip().isnumeric():
-                    number = bin(int(line_words[1].strip())).replace("0b","").zfill(32)
-                    if len(number) != 32:
-                        print("Large Number")
+            if len(line_words) == 1:
+                try:
+                    number,valid = self.__parse_hex(line_words[0].strip(),32)
+                    if valid == False or number[0] == '1':
+                        print("invalid address in line "+str(self.code_lines[i][1]) + " !")
                         break
-                    self.data_ram[line_words[0][1:4]] = number
+                    self.binary_code[self.current_code_mem_location]   = number[16:]
+                    self.binary_code[self.current_code_mem_location+1] = number[:16]
                     continue
-                else:
-                    print("invalid RST/INT address!")
+                except:
+                    pass
+            if len(line_words) == 2 and line_words[0][:4] == '.org':
+                try:
+                    number,valid = self.__parse_hex(line_words[1].strip(),32)
+                    if valid == False:
+                        print("Large Number in line "+str(self.code_lines[i][1]) + " !")
+                        break
+                    else:                               #normal address
+                        if number[0] == '1':
+                            print("Negative address in ORG line " + self.code_lines[i][1] + " !")
+                            break
+                        self.current_code_mem_location = self.__unsigned_bin_to_dec(number)
+                    continue
+                except:
+                    print("invalid number in line "+str(self.code_lines[i][1]) + " !")
                     break
-           
-            if line_words[0][:4] == '.org':
-                self.current_code_mem_location = int(line_words[1].strip())
-                continue
             
             ir, size = self.__get_instruction_info(line)
 
             if size == 0:
-                print("invalid instruction !")
+                print("invalid instruction in line " + str(self.code_lines[i][1]) + " !")
                 return
             elif size == 1 and len(ir)==16:
                 self.binary_code[self.current_code_mem_location] = ir
@@ -155,7 +218,7 @@ class Assembler():
                     self.binary_code[self.current_code_mem_location]   = ir[16:]
                     self.binary_code[self.current_code_mem_location+1] = ir[:16]
             else:
-                print("Large immediate value!")
+                print("invalid immediate value in line " + str(self.code_lines[i][1]) + " !")
                 return
             self.current_code_mem_location += size
 
@@ -170,18 +233,9 @@ class Assembler():
                 else:
                     f.write('0'*16 + "\n")
 
-    def __save_data(self):
-        if len(self.data_ram.keys()) == 0:
-            return
-        with open(self.data_ram_path, "w") as f:
-            f.write(self.data_ram['rst'][:16] + '\n')
-            f.write(self.data_ram['rst'][16:] + '\n')
-            f.write(self.data_ram['int'][:16] + '\n')
-            f.write(self.data_ram['int'][16:] + '\n')
 
 if __name__ == '__main__':
     code_file_path = sys.argv[1]
     code_ram_file_path = sys.argv[2]
-    data_ram_file_path = sys.argv[3]
-    a = Assembler(code_file_path, code_ram_file_path,data_ram_file_path)
+    a = Assembler(code_file_path, code_ram_file_path)
     a.parse()
