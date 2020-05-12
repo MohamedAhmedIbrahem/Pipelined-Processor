@@ -12,6 +12,8 @@ if {[catch { exec python Assembler/assembler.py $code_file_path $memory_file_pat
 
 ### Initialize simulation
 vsim CPU  
+#add wave Execute_Stage/*
+#add wave Execute_Stage/ALU_MODULE/*
 #add wave -unsigned *
 #add wave -unsigned CPU/Fetch_Stage/fetch_forwarding_unit/*
 #add wave -unsigned CPU/Execute_Stage/EX_FORW_UNIT/*
@@ -25,20 +27,21 @@ add wave -hexadecimal Decode_Stage/registers/Register_File
 add wave -hexadecimal Input_Port 
 add wave -hexadecimal Output_Port
 add wave flags
-add wave -hexadecimal Decode_Stage/sp_data_out
+
 # Remove numeric std warnings before initialization
 set NumericStdNoWarnings 1; list
 run 0
 set NumericStdNoWarnings 0; list
 
 ############################
-add wave -hexadecimal Fetch_Stage/pc_out
+add wave -label PC -hexadecimal Fetch_Stage/pc_out
+add wave -label SP -hexadecimal { Decode_stage/sp_data_out (10 DOWNTO 0) }
 #add wave -radix unsigned Fetch_Stage/pc_in
 #add wave Fetch_Stage/pc_enable
 #add wave Fetch_Stage/instruction_read
 #add wave Fetch_Stage/RET_Fetch
 #add wave Fetch_Stage/int_internal
-#add wave Execute_Stage/*
+#add wave Fetch_Stage/interrupt_controller/*
 ############################
 
 
@@ -71,6 +74,12 @@ run 100
 force Input_Port 16#FFFFFFFF   
 run 100
 force Input_Port 16#200
-run 2000
-
+run 1100
+force INT 1
+run 100
+force INT 0
+run 4100
+force INT 1
+run 100
+force INT 0
 

@@ -24,7 +24,8 @@ ENTITY fetch_stage IS
         instruction_memory_out: IN std_logic_vector(0 TO INSTRUCTION_WORD_SIZE-1);
         ir_fetch : OUT std_logic_vector(0 TO INSTRUCTION_WORD_SIZE-1);
         pc_out : OUT std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
-        instruction_read: OUT std_logic
+        instruction_read: OUT std_logic;
+	fetch_stall, memory_stall : IN std_logic
     );
 END;
 
@@ -99,7 +100,7 @@ BEGIN
     interrupt_controller : ENTITY work.interrupt_controller
         PORT MAP(
             clk, rst, int_external, jmp_fetch, jz_fetch, jz_decode, ret_fetch, rti_fetch,
-            is_int_executing, bubble_pc_write_back, is_two_word, int_internal
+            is_int_executing, bubble_pc_write_back, is_two_word, fetch_stall, memory_stall, int_internal
         );
 
     fetch_forwarding_unit : ENTITY work.Fetch_Forwarding_Unit

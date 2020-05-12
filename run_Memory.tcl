@@ -25,8 +25,6 @@ add wave -hexadecimal Decode_Stage/registers/Register_File
 add wave -hexadecimal Input_Port 
 add wave -hexadecimal Output_Port
 add wave flags
-add wave -hexadecimal Decode_Stage/sp_to_operand
-add wave -hexadecimal Decode_Stage/sp_data_out
 
 # Remove numeric std warnings before initialization
 set NumericStdNoWarnings 1; list
@@ -34,7 +32,8 @@ run 0
 set NumericStdNoWarnings 0; list
 
 ############################
-add wave -hexadecimal Fetch_Stage/pc_out
+add wave -label PC -hexadecimal Fetch_Stage/pc_out
+add wave -label SP -hexadecimal { Decode_stage/sp_data_out (10 DOWNTO 0) }
 #add wave -radix unsigned Fetch_Stage/pc_in
 #add wave Fetch_Stage/pc_enable
 #add wave Fetch_Stage/instruction_read

@@ -32,7 +32,8 @@ run 0
 set NumericStdNoWarnings 0; list
 
 ############################
-add wave -hexadecimal Fetch_Stage/pc_out
+add wave -label PC -hexadecimal Fetch_Stage/pc_out
+add wave -label SP -hexadecimal { Decode_stage/sp_data_out (10 DOWNTO 0) }
 #add wave -radix unsigned Fetch_Stage/pc_in
 #add wave Fetch_Stage/pc_enable
 #add wave Fetch_Stage/instruction_read

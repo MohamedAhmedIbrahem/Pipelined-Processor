@@ -69,17 +69,17 @@ fetch_stall <= Fetch_Forwarding_Stall OR PCWB_Stall OR EX_Forwarding_Stall OR (i
 memory_stall <= NOT data_ready AND (data_read OR data_write);
 decode_stall <= NOT (EX_Forwarding_Stall or memory_stall);
 ---------------------------------------------- Fetch Stage ----------------------------------------------------------
-Fetch_Stage : ENTITY work.Fetch_Stage GENERIC MAP (16, 32, 4) PORT MAP (CLK, RST, PCWB_WB OR NOT fetch_stall,
+Fetch_Stage : ENTITY work.Fetch_Stage GENERIC MAP (16, 32, 4) PORT MAP (CLK, RST, PCWB_WB OR (NOT fetch_stall AND NOT memory_stall),
 								       INT, PCWB_WB, P_TAKEN_DEC_IN, JZ_DEC_OUT, Flags(0), PCWB_Stall,
 								       Port3_DEC_OUT, Op1_WB, PC_KEY_DEC_IN, WB1_DEC_OUT, WB2_DEC_OUT,
 								       WB1_EX_IN, WB2_EX_IN, WB1_MEM_IN, WB2_MEM_IN, RD_MEM_IN, I_O_MEM_IN,
 								       DST1_DEC_OUT, DST2_DEC_OUT, DST1_EX_IN, DST2_EX_IN, DST1_MEM_IN, DST2_MEM_IN,
 								       Op1_MEM_IN, Op2_MEM_IN, Fetch_Forwarding_Stall, P_TAKEN_FETCH, False_Prediction_FETCH,
-								       PC_KEY_FETCH, PC_Transparent, instruction_out, IR_FETCH, pc_out, instruction_read);
+								       PC_KEY_FETCH, PC_Transparent, instruction_out, IR_FETCH, pc_out, instruction_read, fetch_stall, memory_stall);
 
 ---------------------------------------------- Fetch/Decode Buffer -----------------------------------------------------
-FETCH_DC_BUFFER : ENTITY work.FETCH_DC_BUFFER PORT MAP (CLK, RST OR (fetch_stall AND NOT memory_stall), 
-					               NOT (memory_stall or EX_Forwarding_Stall), NOT (EX_Forwarding_Stall OR (NOT IR_FETCH(0) AND IR_FETCH(1)) OR memory_stall),  
+FETCH_DC_BUFFER : ENTITY work.FETCH_DC_BUFFER PORT MAP (CLK, RST OR (fetch_stall AND NOT memory_stall) OR False_Prediction_FETCH, RST OR False_Prediction_FETCH,  
+					               NOT (memory_stall or EX_Forwarding_Stall), NOT (EX_Forwarding_Stall OR (NOT IR_FETCH(0) AND IR_FETCH(1)) OR memory_stall OR fetch_stall),  
         				  	       P_TAKEN_FETCH, P_TAKEN_DEC_IN, PC_KEY_FETCH, PC_KEY_DEC_IN,
 	    				               IR_FETCH, IR_HIGH_DEC_IN, IR_LOW_DEC_IN);
 

@@ -3,8 +3,8 @@
 #this is a commented line
 .ORG 0  #this means the the following line would be  at address  0 , and this is the reset address
 10
-#you should ignore empty lines
 
+#you should ignore empty lines
 .ORG 2  #this is the interrupt address
 100
 
@@ -17,29 +17,27 @@ JMP R1 #jump to 18
 
 .ORG 18 #Loop A
 SUB R7,R2,R4 #check if R4 = R2, Instr cache read miss will occur with each loop iteration
-JZ R3 #jump to 30 if R4 = R2
+JZ R3 #jump to 30 if R4 = R2  #instruction miss
 CALL R0 #Instr cache read miss for block starting with 118 each time we call. Data cache write miss for the first iteration in loop for block starting with 7F8.
 OUT R5
 INC R4
 JMP R1 #jump to 18
 
-
 .ORG 30
-in R1 #R1 = 38
+in R1 #R1 = 38  
 in R3 #R3 = 50
 in R4 #R4 = 0
 STD R1,210 #M[210, 211]=38, Data cache write miss
-JMP R1 #jump to 38
+JMP R1 #jump to 38     
 
 .ORG 38 #Loop B
 SUB R7,R2,R4 #check if R4 = R2, Instr cache read miss will occur for first loop iteration
-JZ R3 #jump to 50 if R4 = R2
+JZ R3 #jump to 50 if R4 = R2  #Miss
 CALL R0#Instr cache read miss for block starting with 118 for first loop iteration.
 LDD R1,210 #R1 = 38, Data cache read miss with each iteration, replaced block is dirty
 OUT R5
 INC R4
 JMP R1 #jump to 38
-
 
 .ORG 50
 STD R6,212 #M[212, 213]=R6
@@ -50,6 +48,6 @@ STD R6,312 #M[312, 313]=R6, Data cache write miss (once in loop A, with each ite
 LDM R7,0FF #R7=0FF 
 AND R6,R6,R7
 LDM R5,1 #R5=1
-OR R5,R5,R6
+OR R5,R5,R6  #instruction miss
 LDD R6,312 #R6=M[312, 313]
 ret
