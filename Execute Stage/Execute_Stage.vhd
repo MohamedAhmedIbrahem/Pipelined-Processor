@@ -2,8 +2,10 @@ LIBRARY IEEE;
 USE IEEE.std_logic_1164.ALL;
 USE WORK.bus_array_pkg.ALL;
 USE IEEE.numeric_std.ALL;
+USE WORK.mode_type.ALL;
 
 ENTITY Execute_Stage IS
+	GENERIC (w_Mode : Mode  := Forwarding); 
 	PORT (
 		CLK, RST 						: IN STD_LOGIC;
 		Op1_EX, Op2_EX                                  	: IN STD_LOGIC_VECTOR(31 DOWNTO 0);     -- operands
@@ -41,7 +43,7 @@ ARCHITECTURE Execute_Stage_Arch OF Execute_Stage IS
 	SIGNAL FLAGSWB_WB_TMP, FLAGS_REG_EN_TMP, MEM_Op1_MUX_Enable : STD_LOGIC_VECTOR(0 DOWNTO 0);
 BEGIN
   	
-	EX_FORW_UNIT : ENTITY work.Execute_Forwarding_Unit PORT MAP (RST, IS_SRC1_EX, IS_SRC2_EX, SRC1_EX, SRC2_EX, WB1_MEM, WB2_MEM, RD_MEM, I_O_MEM, 	
+	EX_FORW_UNIT : ENTITY work.Execute_Forwarding_Unit GENERIC MAP (w_Mode) PORT MAP (RST, IS_SRC1_EX, IS_SRC2_EX, SRC1_EX, SRC2_EX, WB1_MEM, WB2_MEM, RD_MEM, I_O_MEM, 	
 			DST1_MEM, DST2_MEM, Op1_MEM, Op2_MEM, WB1_WB, WB2_WB, DST1_WB, DST2_WB, Op1_WB, Op2_WB, Op1_Forwarding_Enable(0),
 			Op2_Forwarding_Enable(0), EX_Forwarding_Stall, Op1_Forwarded, Op2_Forwarded); 	
 

@@ -1,9 +1,12 @@
 LIBRARY IEEE;
+USE WORK.mode_type.ALL;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.NUMERIC_STD.ALL;
 USE IEEE.STD_LOGIC_SIGNED.ALL;
 
+
 ENTITY Fetch_Forwarding_Unit IS
+	GENERIC (w_Mode : Mode  := Forwarding); 
 	PORT (
 		RST 						: IN STD_LOGIC;
 		JZ_Fetch, JMP_Fetch		 		: IN STD_LOGIC; 			-- Fetch Stage Signals
@@ -25,7 +28,7 @@ ARCHITECTURE Fetch_Forwarding_Unit_Arch OF Fetch_Forwarding_Unit IS
 BEGIN
 	PROCESS (ALL)
 	BEGIN
-		IF (RST = '1') THEN
+		IF (RST = '1' OR w_Mode = None) THEN
 			Fetch_Forwarding_Enable <= '0';
 			Op_Fetch_Forwarded <= (OTHERS => '0');
 			Fetch_Forwarding_Stall <= '0';
@@ -44,15 +47,18 @@ BEGIN
 
 				ELSIF (((WB1_MEM = '1') AND (SRC1_Fetch = DST1_MEM)) OR		-- Memory Stage
 				       ((WB2_MEM = '1') AND (SRC1_Fetch = DST2_MEM)))   THEN 
-					
-					IF ((RD_MEM = '1') AND (I_O_MEM = '1')) THEN		-- Memory Instruction
+					IF (w_Mode = Hazard_Detection) THEN
 						Fetch_Forwarding_Stall <= '1';
 					ELSE
-						Fetch_Forwarding_Enable <= '1';			-- ALU Instruction
-						IF (WB1_MEM = '1' AND (SRC1_Fetch = DST1_MEM)) THEN
-							Op_Fetch_Forwarded <= Op1_MEM;
-						ELSIF (WB2_MEM = '1' AND (SRC1_Fetch = DST2_MEM)) THEN
-							Op_Fetch_Forwarded <= Op2_MEM;
+						IF ((RD_MEM = '1') AND (I_O_MEM = '1')) THEN		-- Memory Instruction
+							Fetch_Forwarding_Stall <= '1';
+						ELSE
+							Fetch_Forwarding_Enable <= '1';			-- ALU Instruction
+							IF (WB1_MEM = '1' AND (SRC1_Fetch = DST1_MEM)) THEN
+								Op_Fetch_Forwarded <= Op1_MEM;
+							ELSIF (WB2_MEM = '1' AND (SRC1_Fetch = DST2_MEM)) THEN
+								Op_Fetch_Forwarded <= Op2_MEM;
+							END IF;
 						END IF;
 					END IF;
 				END IF;

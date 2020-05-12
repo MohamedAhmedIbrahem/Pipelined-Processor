@@ -16,7 +16,7 @@ if {[catch { exec python Assembler/assembler.py $code_file_path $code_ram_file_p
 ### Initialize simulation
 vsim CPU  
 add wave -unsigned *
-add wave -unsigned CPU/Fetch_Stage/fetch_forwarding_unit/*
+#add wave -unsigned CPU/Fetch_Stage/fetch_forwarding_unit/*
 #add wave -unsigned CPU/Execute_Stage/EX_FORW_UNIT/*
 add wave -unsigned $instruction_memory_sim_path/memory   
 add wave -unsigned $data_memory_sim_path/Mem
@@ -30,10 +30,10 @@ set NumericStdNoWarnings 0; list
 
 ############################
 add wave -radix unsigned Fetch_Stage/pc_out
-add wave -radix unsigned Fetch_Stage/pc_in
-add wave Fetch_Stage/pc_enable
-add wave Fetch_Stage/RET_Fetch
-add wave Fetch_Stage/int_internal
+#add wave -radix unsigned Fetch_Stage/pc_in
+#add wave Fetch_Stage/pc_enable
+#add wave Fetch_Stage/RET_Fetch
+#add wave Fetch_Stage/int_internal
 ############################
 
 ### Load instruction memory

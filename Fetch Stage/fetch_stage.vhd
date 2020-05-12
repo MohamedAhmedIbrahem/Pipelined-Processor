@@ -1,11 +1,14 @@
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.all;
+USE WORK.mode_type.ALL;
 USE IEEE.NUMERIC_STD.all;
+
 
 ENTITY fetch_stage IS
     GENERIC (INSTRUCTION_WORD_SIZE: integer := 16; 
             ADDRESS_SIZE: integer := 32;
-            PREDICTION_CACHE_KEY_SIZE: integer := 4
+            PREDICTION_CACHE_KEY_SIZE: integer := 4;
+	    w_Mode: Mode  := Forwarding 
     );
     PORT (
         clk, rst, pc_enable, int_external, pc_write_back, predicted_taken_decode,
@@ -96,7 +99,8 @@ BEGIN
         );
 
     fetch_forwarding_unit : ENTITY work.Fetch_Forwarding_Unit
-        PORT MAP(
+	GENERIC MAP (w_Mode)
+        PORT MAP (
             rst, jz_fetch, jmp_fetch, ir_fetch(7 TO 9), WB1_DEC, WB2_DEC, DST1_DEC, DST2_DEC,
             WB1_EX, WB2_EX, DST1_EX, DST2_EX, WB1_MEM, WB2_MEM, RD_MEM, I_O_MEM, DST1_MEM, DST2_MEM,
 		    Op1_MEM, Op2_MEM, Fetch_Forwarding_Enable, Fetch_Forwarding_Stall, forwarded_jmp_value	

@@ -1,6 +1,7 @@
 LIBRARY IEEE;
 USE IEEE.std_logic_1164.ALL;
 USE WORK.bus_array_pkg.ALL;
+USE WORK.mode_type.ALL;
 USE IEEE.numeric_std.ALL;
 
 ENTITY CPU IS
@@ -55,6 +56,7 @@ ARCHITECTURE CPU_Arch OF CPU IS
 ----------------------------------  Other Signals ---------------------------------------- 
 	SIGNAL Flags      	            						: STD_LOGIC_VECTOR(3 DOWNTO 0);	
 	SIGNAL EX_Forwarding_Stall, Fetch_Forwarding_Stall, PCWB_Stall, PCWB_Stall_PC_enable : STD_LOGIC;
+        CONSTANT w_Mode: Mode := Forwarding;
 	
 BEGIN
 
@@ -62,7 +64,8 @@ PCWB_Stall_PC_enable <= PCWB_DEC_OUT OR PCWB_EX_IN OR PCWB_MEM_IN;
 PCWB_Stall <= PCWB_Stall_PC_enable OR PCWB_WB;
 
 ---------------------------------------------- Fetch Stage ----------------------------------------------------------
-Fetch_Stage : ENTITY work.Fetch_Stage GENERIC MAP (16, 32, 4) PORT MAP (CLK, RST, NOT (Fetch_Forwarding_Stall OR PCWB_Stall_PC_enable OR EX_Forwarding_Stall),
+Fetch_Stage : ENTITY work.Fetch_Stage GENERIC MAP (16, 32, 4, w_Mode)  
+								PORT MAP (CLK, RST, NOT (Fetch_Forwarding_Stall OR PCWB_Stall_PC_enable OR EX_Forwarding_Stall),
 								       INT, PCWB_WB, P_TAKEN_DEC_IN, JZ_DEC_OUT, Flags(0), PCWB_Stall,
 								       Port3_DEC_OUT, Op1_WB, PC_KEY_DEC_IN, WB1_DEC_OUT, WB2_DEC_OUT,
 								       WB1_EX_IN, WB2_EX_IN, WB1_MEM_IN, WB2_MEM_IN, RD_MEM_IN, I_O_MEM_IN,
@@ -94,7 +97,9 @@ DC_EX_BUFFER : ENTITY work.DC_EX_BUFFER PORT MAP (CLK, RST, (NOT EX_Forwarding_S
 				    FLAGS_UPD_EX_IN, IS_SRC1_EX_IN, IS_SRC2_EX_IN);
 
 ---------------------------------------------- Execute Stage ---------------------------------------------------------------
-Execute_Stage : ENTITY work.Execute_Stage PORT MAP (CLK, RST, Op1_EX_IN, Op2_EX_IN, ALU_Op_EX_IN, SRC1_EX_IN, SRC2_EX_IN, DST1_EX_IN, DST2_EX_IN,              	        	
+Execute_Stage : ENTITY work.Execute_Stage 
+				   GENERIC MAP (w_Mode)
+				   PORT MAP (CLK, RST, Op1_EX_IN, Op2_EX_IN, ALU_Op_EX_IN, SRC1_EX_IN, SRC2_EX_IN, DST1_EX_IN, DST2_EX_IN,              	        	
 				   WB1_EX_IN, WB2_EX_IN, WR_EX_IN, RD_EX_IN, I_O_EX_IN, PCWB_EX_IN, FLAGSWB_EX_IN, 
 				   FLAGS_UPD_EX_IN, IS_SRC1_EX_IN, IS_SRC2_EX_IN, WB1_MEM_IN, WB2_MEM_IN, RD_MEM_IN, 
 				   I_O_MEM_IN, DST1_MEM_IN, DST2_MEM_IN, Op1_MEM_IN, Op2_MEM_IN, WB1_WB, WB2_WB, FLAGSWB_WB,	 			
