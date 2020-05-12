@@ -29,7 +29,7 @@ BEGIN
 		CARRY := RES(32);
 		FLAGS_UPD := '1';
 	ELSIF OP = "0100" THEN	-- DEC
-		RES := ('0' & A) - 1;
+		RES := ('0' & A) + ('0'& x"FFFFFFFF");
 		CARRY := RES(32);
 		FLAGS_UPD := '1';
 	ELSIF OP = "0101" THEN	-- ADD
