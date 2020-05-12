@@ -55,19 +55,19 @@ ARCHITECTURE CPU_Arch OF CPU IS
 	SIGNAL WB1_WB, WB2_WB, PCWB_WB, FLAGSWB_WB		 			: STD_LOGIC;
 ---------------------------------- Memory Controller Signals ---------------------------------------
 	SIGNAL data_write, data_read, instruction_read, data_ready, instruction_ready :  std_logic;
-    SIGNAL data_address: std_logic_vector (10 DOWNTO 0);
-    SIGNAL data_in, data_out: std_logic_vector (31 DOWNTO 0);
+        SIGNAL data_address: std_logic_vector (10 DOWNTO 0);
+        SIGNAL data_in, data_out: std_logic_vector (31 DOWNTO 0);
 	SIGNAL instruction_out: std_logic_vector (15 DOWNTO 0);
 ----------------------------------  Other Signals ---------------------------------------- 
 	SIGNAL Flags      	            						: STD_LOGIC_VECTOR(3 DOWNTO 0);	
 	SIGNAL EX_Forwarding_Stall, Fetch_Forwarding_Stall, PCWB_Stall : STD_LOGIC;
-	SIGNAL fetch_stall, memory_stall : std_logic;
+	SIGNAL fetch_stall, memory_stall, decode_stall : std_logic;
 BEGIN
 
 PCWB_Stall <= PCWB_DEC_OUT OR PCWB_EX_IN OR PCWB_MEM_IN OR PCWB_WB;
 fetch_stall <= Fetch_Forwarding_Stall OR PCWB_Stall OR EX_Forwarding_Stall OR (instruction_read AND NOT instruction_ready);
 memory_stall <= NOT data_ready AND (data_read OR data_write);
-
+decode_stall <= NOT (EX_Forwarding_Stall or memory_stall);
 ---------------------------------------------- Fetch Stage ----------------------------------------------------------
 Fetch_Stage : ENTITY work.Fetch_Stage GENERIC MAP (16, 32, 4) PORT MAP (CLK, RST, PCWB_WB OR NOT fetch_stall,
 								       INT, PCWB_WB, P_TAKEN_DEC_IN, JZ_DEC_OUT, Flags(0), PCWB_Stall,
@@ -84,7 +84,7 @@ FETCH_DC_BUFFER : ENTITY work.FETCH_DC_BUFFER PORT MAP (CLK, RST OR (fetch_stall
 	    				               IR_FETCH, IR_HIGH_DEC_IN, IR_LOW_DEC_IN);
 
 ---------------------------------------------- Decode Stage -------------------------------------------------------------
-Decode_Stage : ENTITY work.Decode_Stage PORT MAP (CLK, RST, IR_HIGH_DEC_IN, IR_LOW_DEC_IN, (NOT EX_Forwarding_Stall),  
+Decode_Stage : ENTITY work.Decode_Stage PORT MAP (CLK, RST, IR_HIGH_DEC_IN, IR_LOW_DEC_IN, decode_stall,  
 	        		   		  PC_Transparent, Flags, Op1_DEC_OUT, Op2_DEC_OUT, ALU_OP_DEC_OUT,
 				   		  FLAGS_UPD_DEC_OUT, WB1_DEC_OUT, WB2_DEC_OUT, WR_DEC_OUT, RD_DEC_OUT,
 				   		  I_O_DEC_OUT, PCWB_DEC_OUT, FLAGSWB_DEC_OUT, SRC1_DEC_OUT, SRC2_DEC_OUT,
@@ -92,7 +92,7 @@ Decode_Stage : ENTITY work.Decode_Stage PORT MAP (CLK, RST, IR_HIGH_DEC_IN, IR_L
 	        		   		  WB1_WB, WB2_WB, DST1_WB, DST2_WB, Op1_WB, Op2_WB, IR_FETCH(7 TO 9), Port3_DEC_OUT);
 
 ---------------------------------------------- Decode/Execute Buffer ------------------------------------------------------
-DC_EX_BUFFER : ENTITY work.DC_EX_BUFFER PORT MAP (CLK, RST, NOT (EX_Forwarding_Stall or memory_stall),                                     						
+DC_EX_BUFFER : ENTITY work.DC_EX_BUFFER PORT MAP (CLK, RST, decode_stall,                                     						
         	 		    Op1_DEC_OUT, Op2_DEC_OUT, ALU_OP_DEC_OUT, SRC1_DEC_OUT, SRC2_DEC_OUT, DST1_DEC_OUT, DST2_DEC_OUT,                            						    
         			    WB1_DEC_OUT, WB2_DEC_OUT, WR_DEC_OUT, RD_DEC_OUT, I_O_DEC_OUT, PCWB_DEC_OUT, FLAGSWB_DEC_OUT,
 				    FLAGS_UPD_DEC_OUT, IS_SRC1_DEC_OUT, IS_SRC2_DEC_OUT, Op1_EX_IN, Op2_EX_IN, 

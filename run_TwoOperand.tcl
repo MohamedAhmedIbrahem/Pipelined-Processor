@@ -61,9 +61,9 @@ force Input_Port 16#5
 run 100
 force Input_Port 16#19
 run 100
-force Input_Port 16#FFFD
+force Input_Port 16#FFFFFFFD
 run 100
-force Input_Port 16#F320
+force Input_Port 16#FFFFF320
 run 2000
 
 

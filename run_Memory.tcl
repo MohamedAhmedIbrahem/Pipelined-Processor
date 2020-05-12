@@ -25,6 +25,9 @@ add wave -hexadecimal Decode_Stage/registers/Register_File
 add wave -hexadecimal Input_Port 
 add wave -hexadecimal Output_Port
 add wave flags
+add wave -hexadecimal Decode_Stage/sp_to_operand
+add wave -hexadecimal Decode_Stage/sp_data_out
+
 # Remove numeric std warnings before initialization
 set NumericStdNoWarnings 1; list
 run 0
@@ -60,8 +63,8 @@ force RST 0
 run 1800
 force Input_Port 16#0CDAFE19
 run 100
-force Input_Port 16#FFFF
+force Input_Port 16#FFFFFFFF
 run 100
-force Input_Port 16#F320 
+force Input_Port 16#FFFFF320 
 run 2000
 

@@ -19,7 +19,6 @@ BEGIN
     VARIABLE CARRY,FLAGS_UPD: STD_LOGIC;
     BEGIN 
 	RES   := (OTHERS => '0');
-	CARRY := '0';
 	FLAGS_UPD := '0';
 	IF OP = "0010" THEN		-- NOT
 		RES(31 DOWNTO 0) := NOT A;
@@ -37,7 +36,7 @@ BEGIN
 		CARRY := RES(32);
 		FLAGS_UPD := '1';
 	ELSIF OP = "0110" THEN	-- SUB
-		RES := ('0' & A) - ('0' & B);
+		RES := ('0' & A) + ('0' & (NOT B + 1));
 		CARRY := RES(32);
 		FLAGS_UPD := '1';
 	ELSIF OP = "0111" THEN	-- AND
