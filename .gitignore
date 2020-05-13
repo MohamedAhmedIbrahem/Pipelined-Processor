@@ -9,3 +9,5 @@ work/
 transcript
 *vscode*
 *.bak
+*.mpf_lock
+*.mpf_new
