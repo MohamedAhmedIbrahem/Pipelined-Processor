@@ -24,7 +24,8 @@ ENTITY fetch_stage IS
         predicted_taken, false_prediction: OUT std_logic;
         prediction_cache_key: OUT std_logic_vector(PREDICTION_CACHE_KEY_SIZE-1 DOWNTO 0);
 	pc_transparent_out: OUT std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
-        ir_fetch : OUT std_logic_vector(0 TO INSTRUCTION_WORD_SIZE-1)
+        ir_fetch : OUT std_logic_vector(0 TO INSTRUCTION_WORD_SIZE-1);
+        correct_prediction: OUT std_logic
     );
 END;
 
@@ -46,6 +47,8 @@ ARCHITECTURE fetch_stage_arch OF fetch_stage IS
     SIGNAL pc_incremented : std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
     SIGNAL op_code: std_logic_vector(0 TO 4);
 BEGIN
+    correct_prediction <= jz_decode and not false_prediction;   -- For testing 
+
     pc_transparent_in <= jmp_register WHEN (jz_fetch = '1' and predicted_taken = '0') 
                                       ELSE pc_incremented;
 
