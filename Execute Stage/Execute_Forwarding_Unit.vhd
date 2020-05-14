@@ -41,64 +41,51 @@ BEGIN
 ----------------------------------------- SRC 1 -----------------------------------------------------
 			IF (IS_SRC1_EX = '1') AND 
 			   (((WB1_MEM = '1') AND (SRC1_EX = DST1_MEM)) OR ((WB2_MEM = '1') AND (SRC1_EX = DST2_MEM))) THEN -- Memory Stage	
-				IF (w_Mode = Hazard_Detection) THEN
+				IF (RD_MEM = '1') AND (I_O_MEM = '1') THEN -- Memory Instruction
 					EX_Forwarding_Stall <= '1';
-				ELSE
-					IF (RD_MEM = '1') AND (I_O_MEM = '1') THEN -- Memory Instruction
-						EX_Forwarding_Stall <= '1';
-					ELSE -- ALU Instruction
-						Op1_EX_Forwarding_Enable <= '1';
-						IF (WB1_MEM = '1' AND (SRC1_EX = DST1_MEM)) THEN
-							Op1_EX_Forwarded <= Op1_MEM;
-						ELSIF (WB2_MEM = '1' AND (SRC1_EX = DST2_MEM)) THEN
-							Op1_EX_Forwarded <= Op2_MEM;
-						END IF;
+				ELSE -- ALU Instruction
+					Op1_EX_Forwarding_Enable <= '1';
+					IF (WB1_MEM = '1' AND (SRC1_EX = DST1_MEM)) THEN
+						Op1_EX_Forwarded <= Op1_MEM;
+					ELSIF (WB2_MEM = '1' AND (SRC1_EX = DST2_MEM)) THEN
+						Op1_EX_Forwarded <= Op2_MEM;
 					END IF;
 				END IF;
 			ELSIF (IS_SRC1_EX = '1') AND (((WB1_WB = '1') AND 
 			      (SRC1_EX = DST1_WB)) OR ((WB2_WB = '1') AND (SRC1_EX = DST2_WB))) THEN -- Write Back Stage	
-				IF (w_Mode = Hazard_Detection) THEN
-					EX_Forwarding_Stall <= '1';
-				ELSE
-					Op1_EX_Forwarding_Enable <= '1';
-					IF (WB1_WB = '1' AND (SRC1_EX = DST1_WB))THEN
-						Op1_EX_Forwarded <= Op1_WB;
-					ELSIF (WB2_WB = '1' AND (SRC1_EX = DST2_WB)) THEN
-						Op1_EX_Forwarded <= Op2_WB;
-					END IF;
+				Op1_EX_Forwarding_Enable <= '1';
+				IF (WB1_WB = '1' AND (SRC1_EX = DST1_WB))THEN
+					Op1_EX_Forwarded <= Op1_WB;
+				ELSIF (WB2_WB = '1' AND (SRC1_EX = DST2_WB)) THEN
+					Op1_EX_Forwarded <= Op2_WB;
 				END IF;
 			END IF;
 ----------------------------------------- SRC 2 -----------------------------------------------------
 			IF (IS_SRC2_EX = '1') AND (((WB1_MEM = '1') AND 
 			   (SRC2_EX = DST1_MEM)) OR ((WB2_MEM = '1') AND (SRC2_EX = DST2_MEM))) THEN -- Memory Stage	
-				IF (w_Mode = Hazard_Detection) THEN
+				IF (RD_MEM = '1') AND (I_O_MEM = '1') THEN
 					EX_Forwarding_Stall <= '1';
 				ELSE
-					IF (RD_MEM = '1') AND (I_O_MEM = '1') THEN
-						EX_Forwarding_Stall <= '1';
-					ELSE
-						Op2_EX_Forwarding_Enable <= '1';
-						IF ((WB1_MEM = '1') AND (SRC2_EX = DST1_MEM)) THEN
-							Op2_EX_Forwarded <= Op1_MEM;
-						ELSIF ((WB2_MEM = '1') AND (SRC2_EX = DST2_MEM)) THEN
-							Op2_EX_Forwarded <= Op2_MEM;
-						END IF;
+					Op2_EX_Forwarding_Enable <= '1';
+					IF ((WB1_MEM = '1') AND (SRC2_EX = DST1_MEM)) THEN
+						Op2_EX_Forwarded <= Op1_MEM;
+					ELSIF ((WB2_MEM = '1') AND (SRC2_EX = DST2_MEM)) THEN
+						Op2_EX_Forwarded <= Op2_MEM;
 					END IF;
 				END IF;
 			ELSIF (IS_SRC2_EX = '1') AND (((WB1_WB = '1') AND 
 			      (SRC2_EX = DST1_WB)) OR ((WB2_WB = '1') AND (SRC2_EX = DST2_WB))) THEN -- Write Back Stage	
-				IF (w_Mode = Hazard_Detection) THEN
-					EX_Forwarding_Stall <= '1';
-				ELSE
-					Op2_EX_Forwarding_Enable <= '1';
-					IF (WB1_WB = '1' AND (SRC2_EX = DST1_WB)) THEN
-						Op2_EX_Forwarded <= Op1_WB;
-					ELSIF (WB2_WB = '1' AND (SRC2_EX = DST2_WB)) THEN
-						Op2_EX_Forwarded <= Op2_WB;
-					END IF;
+				Op2_EX_Forwarding_Enable <= '1';
+				IF (WB1_WB = '1' AND (SRC2_EX = DST1_WB)) THEN
+					Op2_EX_Forwarded <= Op1_WB;
+				ELSIF (WB2_WB = '1' AND (SRC2_EX = DST2_WB)) THEN
+					Op2_EX_Forwarded <= Op2_WB;
 				END IF;
 			END IF;
 ------------------------------------------------------------------------------------------------------------
+		END IF;
+		IF (w_Mode = Hazard_Detection) THEN
+			EX_Forwarding_Stall <= '0';
 		END IF;
 	END PROCESS;
 END ARCHITECTURE;

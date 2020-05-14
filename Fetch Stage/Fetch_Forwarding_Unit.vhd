@@ -43,26 +43,24 @@ BEGIN
 				ELSIF (((WB1_EX = '1') AND (SRC1_Fetch = DST1_EX)) OR		-- Execute Stage
 				       ((WB2_EX = '1') AND (SRC1_Fetch = DST2_EX)))   THEN 
 					Fetch_Forwarding_Stall <= '1';
-		
 
 				ELSIF (((WB1_MEM = '1') AND (SRC1_Fetch = DST1_MEM)) OR		-- Memory Stage
 				       ((WB2_MEM = '1') AND (SRC1_Fetch = DST2_MEM)))   THEN 
-					IF (w_Mode = Hazard_Detection) THEN
+					IF ((RD_MEM = '1') AND (I_O_MEM = '1')) THEN		-- Memory Instruction
 						Fetch_Forwarding_Stall <= '1';
 					ELSE
-						IF ((RD_MEM = '1') AND (I_O_MEM = '1')) THEN		-- Memory Instruction
-							Fetch_Forwarding_Stall <= '1';
-						ELSE
-							Fetch_Forwarding_Enable <= '1';			-- ALU Instruction
-							IF (WB1_MEM = '1' AND (SRC1_Fetch = DST1_MEM)) THEN
-								Op_Fetch_Forwarded <= Op1_MEM;
-							ELSIF (WB2_MEM = '1' AND (SRC1_Fetch = DST2_MEM)) THEN
-								Op_Fetch_Forwarded <= Op2_MEM;
-							END IF;
+						Fetch_Forwarding_Enable <= '1';			-- ALU Instruction
+						IF (WB1_MEM = '1' AND (SRC1_Fetch = DST1_MEM)) THEN
+							Op_Fetch_Forwarded <= Op1_MEM;
+						ELSIF (WB2_MEM = '1' AND (SRC1_Fetch = DST2_MEM)) THEN
+							Op_Fetch_Forwarded <= Op2_MEM;
 						END IF;
 					END IF;
 				END IF;
 			END IF;
+		END IF;
+		IF (w_Mode = Hazard_Detection) THEN
+			Fetch_Forwarding_Stall <= '0';
 		END IF;
 	END PROCESS;
 END ARCHITECTURE;
