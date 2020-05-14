@@ -17,7 +17,8 @@ BEGIN
     BEGIN
         IF RISING_EDGE(CLK) THEN
             IF RST ='1' THEN
-                Dout <= std_logic_vector(to_unsigned(1998, Size));
+                Dout <= (OTHERS => '1');
+                Dout(0) <= '0';
             ELSIF EN ='1' THEN
                 Dout <= Din;
             END IF;

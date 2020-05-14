@@ -83,7 +83,7 @@ force INT 0
 force Input_Port 16#0
 run 100
 force RST 0
-run 1800
+run 800
 force Input_Port 16#5
 run 100
 force Input_Port 16#19

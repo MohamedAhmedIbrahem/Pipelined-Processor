@@ -81,7 +81,10 @@ force INT 0
 force Input_Port 16#0
 run 100
 force RST 0
-run 2100
+#Case 2, 3
+run 1100
+#Case 1
+#run 1200  
 force Input_Port 16#5
 run 100
 force Input_Port 16#10

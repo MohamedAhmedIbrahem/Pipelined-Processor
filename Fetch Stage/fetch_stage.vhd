@@ -30,7 +30,7 @@ ENTITY fetch_stage IS
 END;
 
 ARCHITECTURE fetch_stage_arch OF fetch_stage IS
-    CONSTANT INSTRUCTION_MEMORY_SIZE : integer := 200;
+    CONSTANT INSTRUCTION_MEMORY_SIZE : integer := 5000;
     CONSTANT INTERNAL_INSTRUCTIONS_START_ADDRESS : integer := INSTRUCTION_MEMORY_SIZE - 8;
     -- Constant JUMP addresses --
     CONSTANT RST_ADDRESS: std_logic_vector := std_logic_vector(

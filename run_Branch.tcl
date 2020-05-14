@@ -38,6 +38,7 @@ set NumericStdNoWarnings 0; list
 ############################
 add wave -label PC -hexadecimal Fetch_Stage/pc_out
 add wave -label SP -hexadecimal { Decode_stage/sp_data_out (10 DOWNTO 0) }
+add wave CPU/Fetch_Stage/correct_prediction
 #add wave -radix unsigned Fetch_Stage/pc_in
 #add wave Fetch_Stage/pc_enable
 #add wave Fetch_Stage/instruction_read
@@ -85,7 +86,7 @@ force INT 0
 force Input_Port 16#0
 run 100
 force RST 0
-run 1800
+run 800
 force Input_Port 16#30
 run 100
 force Input_Port 16#50

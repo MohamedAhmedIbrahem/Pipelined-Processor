@@ -15,7 +15,8 @@ if {[catch { exec python Assembler/assembler.py $code_file_path $code_ram_file_p
 
 ### Initialize simulation
 vsim CPU  
-#add wave -unsigned *
+add wave -unsigned *
+add wave -unsigned $data_memory_sim_path/*
 #add wave -unsigned CPU/Fetch_Stage/fetch_forwarding_unit/*
 #add wave -unsigned CPU/Execute_Stage/EX_FORW_UNIT/*
 add wave CLK
@@ -84,7 +85,7 @@ force INT 0
 force Input_Port 16#0
 run 100
 force RST 0
-run 1800
+run 800
 force Input_Port 16#0CDAFE19
 run 100
 force Input_Port 16#FFFFFFFF
