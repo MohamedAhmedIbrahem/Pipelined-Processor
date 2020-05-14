@@ -100,12 +100,5 @@ run 100
 force Input_Port 16#FFFFFFFF   
 run 100
 force Input_Port 16#200
-run 1100
-force INT 1
-run 100
-force INT 0
-run 4100
-force INT 1
-run 100
-force INT 0
+run 2000
 

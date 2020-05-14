@@ -15,8 +15,8 @@ if {[catch { exec python Assembler/assembler.py $code_file_path $code_ram_file_p
 
 ### Initialize simulation
 vsim CPU  
-add wave -unsigned *
-add wave -unsigned $data_memory_sim_path/*
+#add wave -unsigned *
+#add wave -unsigned $data_memory_sim_path/*
 #add wave -unsigned CPU/Fetch_Stage/fetch_forwarding_unit/*
 #add wave -unsigned CPU/Execute_Stage/EX_FORW_UNIT/*
 add wave CLK
