@@ -2,13 +2,16 @@
 
 ### Parameters
 set code_file_path "TestCases/BranchPrediction.asm"; list
-set memory_file_path "ram.txt"; list
-set memory_sim_path "CPU/memory_controller/main_memory/Mem"; list
+set code_ram_file_path "code_ram.txt"; list
+set data_ram_file_path "data_ram.txt"; list
+set instruction_memory_sim_path "CPU/Fetch_Stage/instruction_memory"; list
+set data_memory_sim_path "CPU/Memory_Stage/Data_Ram"; list
 
 ### Run the assembler to generate ram contents
-if {[catch { exec python Assembler/assembler.py $code_file_path $memory_file_path }]} {
-    exec python3 Assembler/assembler.py $code_file_path $memory_file_path
+if {[catch { exec python Assembler/assembler.py $code_file_path $code_ram_file_path $data_ram_file_path }]} {
+    exec python3 Assembler/assembler.py $code_file_path $code_ram_file_path $data_ram_file_path
 }
+
 
 ### Initialize simulation
 vsim CPU  
@@ -18,9 +21,8 @@ vsim CPU
 add wave CLK
 add wave RST
 add wave INT
-add wave -hexadecimal memory_controller/main_memory/Mem
-add wave -hexadecimal memory_controller/instruction_cache/cache
-add wave -hexadecimal memory_controller/data_cache/cache
+add wave -unsigned $instruction_memory_sim_path/memory   
+add wave -unsigned $data_memory_sim_path/Mem
 add wave -hexadecimal Decode_Stage/registers/Register_File
 add wave -hexadecimal Input_Port 
 add wave -hexadecimal Output_Port
@@ -42,13 +44,36 @@ add wave -label SP -hexadecimal { Decode_stage/sp_data_out (10 DOWNTO 0) }
 ############################
 
 
-### Load data memory
-set ram_contents_file [open $memory_file_path]; list
+### Load instruction memory
+# Load internal instructions
+set instruction_memory_size [examine -unsigned $instruction_memory_sim_path/MEMORY_SIZE]; list
+set start_address [examine -unsigned Fetch_Stage/INTERNAL_INSTRUCTIONS_START_ADDRESS]; list
+set internal_instructions {
+    0000011000000000
+    0000111000000000
+	1000000000000010
+    0101111000000000
+    0001101000000000
+    1000000000000000
+    0110000000000000
+}; list
+mem load -filldata $internal_instructions $instruction_memory_sim_path/memory -startaddress $start_address
+
+# Load code
+set ram_contents_file [open $code_ram_file_path]; list
 set ram_contents [read $ram_contents_file]; list
 set ram_contents [string trim $ram_contents]; list
 set ram_contents [split $ram_contents "\n"]; list
 set end_address [expr {[llength $ram_contents] - 1}]; list
-mem load -filldata $ram_contents $memory_sim_path -endaddress $end_address
+mem load -filldata $ram_contents $instruction_memory_sim_path/memory -startaddress 0 -endaddress $end_address
+
+### Load data memory
+set ram_contents_file [open $data_ram_file_path]; list
+set ram_contents [read $ram_contents_file]; list
+set ram_contents [string trim $ram_contents]; list
+set ram_contents [split $ram_contents "\n"]; list
+set end_address [expr {[llength $ram_contents] - 1}]; list
+mem load -filldata $ram_contents $data_memory_sim_path/Mem -endaddress $end_address
 
 
 ### Initialize CLK and RST
