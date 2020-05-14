@@ -55,11 +55,12 @@ ARCHITECTURE CPU_Arch OF CPU IS
 	SIGNAL WB1_WB, WB2_WB, PCWB_WB, FLAGSWB_WB		 			: STD_LOGIC;
 ----------------------------------  Other Signals ---------------------------------------- 
 	SIGNAL Flags      	            						: STD_LOGIC_VECTOR(3 DOWNTO 0);	
-	SIGNAL EX_Forwarding_Stall, Fetch_Forwarding_Stall, PCWB_Stall, PCWB_Stall_PC_enable : STD_LOGIC;
+	SIGNAL EX_Forwarding_Stall, Fetch_Forwarding_Stall, PCWB_Stall, PCWB_Stall_PC_enable, IR_flush : STD_LOGIC;
         CONSTANT w_Mode: Mode := None;
 	
 BEGIN
-
+IR_flush <= Fetch_Forwarding_Stall OR PCWB_Stall OR False_Prediction_FETCH WHEN w_Mode = Full
+			ELSE Fetch_Forwarding_Stall OR PCWB_Stall;
 PCWB_Stall_PC_enable <= PCWB_DEC_OUT OR PCWB_EX_IN OR PCWB_MEM_IN;
 PCWB_Stall <= PCWB_Stall_PC_enable OR PCWB_WB;
 
@@ -74,7 +75,7 @@ Fetch_Stage : ENTITY work.Fetch_Stage GENERIC MAP (16, 32, 4, w_Mode)
 								       PC_KEY_FETCH, PC_Transparent, IR_FETCH);
 
 ---------------------------------------------- Fetch/Decode Buffer -----------------------------------------------------
-FETCH_DC_BUFFER : ENTITY work.FETCH_DC_BUFFER PORT MAP (CLK, RST OR (Fetch_Forwarding_Stall OR PCWB_Stall OR False_Prediction_FETCH), 
+FETCH_DC_BUFFER : ENTITY work.FETCH_DC_BUFFER PORT MAP (CLK, RST OR IR_flush, 
 					               (NOT EX_Forwarding_Stall), (EX_Forwarding_Stall NOR ((NOT IR_FETCH(0)) AND IR_FETCH(1))),  
         				  	       P_TAKEN_FETCH, P_TAKEN_DEC_IN, PC_KEY_FETCH, PC_KEY_DEC_IN,
 	    				               IR_FETCH, IR_HIGH_DEC_IN, IR_LOW_DEC_IN);

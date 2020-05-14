@@ -8,7 +8,7 @@ ENTITY fetch_stage IS
     GENERIC (INSTRUCTION_WORD_SIZE: integer := 16; 
             ADDRESS_SIZE: integer := 32;
             PREDICTION_CACHE_KEY_SIZE: integer := 4;
-	    w_Mode: Mode  := Forwarding 
+	    w_Mode: Mode  := Full 
     );
     PORT (
         clk, rst, pc_enable, int_external, pc_write_back, predicted_taken_decode,
@@ -21,7 +21,7 @@ ENTITY fetch_stage IS
         Op1_MEM, Op2_MEM : IN std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
         Fetch_Forwarding_Stall: OUT std_logic;
         -- Forwarding unit signals END
-        predicted_taken, false_prediction: OUT std_logic;
+        predicted_taken_out, false_prediction: OUT std_logic;
         prediction_cache_key: OUT std_logic_vector(PREDICTION_CACHE_KEY_SIZE-1 DOWNTO 0);
 	pc_transparent_out: OUT std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
         ir_fetch : OUT std_logic_vector(0 TO INSTRUCTION_WORD_SIZE-1);
@@ -46,7 +46,9 @@ ARCHITECTURE fetch_stage_arch OF fetch_stage IS
     SIGNAL int_internal, jz_fetch, jmp_fetch, int1_fetch, int2_fetch, rti_fetch, ret_fetch, is_two_word, is_int_executing, Fetch_Forwarding_Enable: std_logic;
     SIGNAL pc_incremented : std_logic_vector(ADDRESS_SIZE-1 DOWNTO 0);
     SIGNAL op_code: std_logic_vector(0 TO 4);
+    SIGNAL predicted_taken : std_logic;
 BEGIN
+    predicted_taken_out <= predicted_taken WHEN w_Mode = Full ELSE '0'; 
     correct_prediction <= jz_decode and not false_prediction;   -- For testing 
 
     pc_transparent_in <= jmp_register WHEN (jz_fetch = '1' and predicted_taken = '0') 
