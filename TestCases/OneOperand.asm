@@ -1,23 +1,20 @@
 .ORG 0  
 10
-
 .ORG 2  
 100
-
 .ORG 10
 
-
 ########################## Original CODE (Case 3) + Case 2 #############################################
-#NOT R1         #R1 =FFFFFFFF , C--> no change, N --> 1, Z --> 0
-#NOP            #No change
-#inc R1	       #R1 =00000000 , C --> 1 , N --> 0 , Z --> 1
-#in R1	       #R1= 5,add 5 on the in port,flags no change	
-#in R2          #R2= 10,add 10 on the in port, flags no change
-#NOT R2	       #R2= FFFFFFEF, C--> no change, N -->1, Z-->0     
-#inc R1         #R1= 6, C --> 0, N -->0, Z-->0
-#Dec R2         #R2= FFFFFFEE,C-->1 , N-->1, Z-->0     #==> 3ndna 2l carry mt3'er4
-#out R1
-#out R2
+NOT R1         
+NOP           
+INC R1	       
+IN R1	       	
+IN R2         
+NOT R2	            
+INC R1        
+DEC R2              
+OUT R1
+OUT R2
 
 ########################## CASE 1 CODE #############################################
 
