@@ -56,10 +56,10 @@ ARCHITECTURE CPU_Arch OF CPU IS
 ----------------------------------  Other Signals ---------------------------------------- 
 	SIGNAL Flags      	            						: STD_LOGIC_VECTOR(3 DOWNTO 0);	
 	SIGNAL EX_Forwarding_Stall, Fetch_Forwarding_Stall, PCWB_Stall, PCWB_Stall_PC_enable, IR_flush : STD_LOGIC;
-        CONSTANT w_Mode: Mode := None;
+        CONSTANT w_Mode: Mode := Full;
 	
 BEGIN
-IR_flush <= Fetch_Forwarding_Stall OR PCWB_Stall OR False_Prediction_FETCH WHEN w_Mode = Full
+IR_flush <= Fetch_Forwarding_Stall OR PCWB_Stall OR False_Prediction_FETCH WHEN w_Mode = Full 
 			ELSE Fetch_Forwarding_Stall OR PCWB_Stall;
 PCWB_Stall_PC_enable <= PCWB_DEC_OUT OR PCWB_EX_IN OR PCWB_MEM_IN;
 PCWB_Stall <= PCWB_Stall_PC_enable OR PCWB_WB;

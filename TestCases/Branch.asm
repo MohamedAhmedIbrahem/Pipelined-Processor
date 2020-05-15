@@ -20,26 +20,16 @@ INC R7
 AND R5,R1,R5  
 JZ  R2       							
 INC R7  
-.ORG 500
-NOP
-NOP
+
 .ORG 50
-JZ R3      									
-NOT R5 
-NOP #Stall
-NOP #Stall   
+JZ R3       									
+NOT R5  
 INC R5   
-in  R6
-NOP #Stall
-NOP #Stall
-NOP #Stall      
-JZ  R6    					   
+in  R6    
+JZ  R6     					   
 INC R1   
 .ORG 200
 POP R6
-NOP #Stall
-NOP #Stall
-NOP #Stall   
 Call R6   			
 INC R6	  
 NOP
@@ -49,6 +39,9 @@ Add R6,R3,R6
 Add R1,R1,R2 
 ret
 INC R7  
+.ORG 500
+NOP
+NOP
 
 ########################## Case 2  #############################################
 #in R1     #R1=30
