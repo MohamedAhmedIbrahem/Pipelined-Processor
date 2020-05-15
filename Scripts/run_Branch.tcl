@@ -64,4 +64,5 @@ run 4100
 force INT 1
 run 100
 force INT 0
+run 10000
 

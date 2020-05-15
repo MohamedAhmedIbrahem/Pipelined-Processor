@@ -47,4 +47,4 @@ run 2100
 force Input_Port 16#5
 run 100
 force Input_Port 16#10
-run 2000
+run 10000
