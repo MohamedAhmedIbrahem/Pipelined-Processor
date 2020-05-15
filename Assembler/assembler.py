@@ -38,7 +38,7 @@ class Assembler():
                         "call": "11110",
                         "out" : "11111",
                         "ret" : "01101",
-                        "rti" : "01110"}
+                        "rti" : "01100"}
         
         self.groupB = { "shl" : "00001",
                         "shr" : "00010"}
@@ -95,12 +95,21 @@ class Assembler():
             try:
                 if words[0] in self.groupA.keys():
                     ir = "00" + self.groupA[words[0]]
+                    operands = []
                     for i in range(1,len(words)):
-                        ir += self.registers[words[i]]
+                        operands.append(self.registers[words[i]])
 
-                    if words[0] == "swap":
-                        ir += self.registers[words[len(words)-1]]
+                    if len(operands) > 0:
+                        length = len(operands)
+                        for i in range(length-1):
+                            operands.append(operands[i])
+                        operands = operands[length-1:]
+                        if words[0] == "swap":
+                            operands.append(operands[len(operands)-1])
                         
+                        for i in range(len(operands)):
+                            ir += operands[i]
+                            
                     ir += ('0' * (16-len(ir)))
                     #print("GroupA",ir,len(ir))
                     return ir,1
@@ -121,7 +130,7 @@ class Assembler():
                         immediate_value,valid = self.__parse_hex(words[3],16)
                         if valid == False:
                             return '0',2
-                        ir ="01" + self.groupC[words[0]] + self.registers[words[1]] + self.registers[words[2]] + "00" + immediate_value[0] + "1" + immediate_value[1:]
+                        ir ="01" + self.groupC[words[0]] + self.registers[words[2]] + self.registers[words[1]] + "00" + immediate_value[0] + "1" + immediate_value[1:]
                     #print("GroupC",ir,len(ir))
                     return ir,2
                 elif words[0] in self.groupD.keys():    #memory
