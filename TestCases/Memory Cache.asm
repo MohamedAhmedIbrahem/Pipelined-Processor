@@ -28,7 +28,7 @@ JMP R1 #jump to 18
 in R1 #R1 = 38
 in R3 #R3 = 50
 in R4 #R4 = 0
-STD R1,210 #M[210, 211]=38, Data cache write miss
+STD R1,210 #M[210, 211]=38, Data cache write miss, replaced block is dirty
 JMP R1 #jump to 38
 
 .ORG 38 #Loop B

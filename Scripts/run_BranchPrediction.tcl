@@ -43,5 +43,4 @@ force INT 0
 force Input_Port 16#0
 run 100
 force RST 0
-run 2000
-
+run 20000

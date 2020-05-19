@@ -47,8 +47,7 @@ force RST 0
 run 1800
 force Input_Port 16#0CDAFE19
 run 100
-force Input_Port 16#FFFFFFFF
+force Input_Port 16#0000FFFF
 run 100
-force Input_Port 16#FFFFF320 
-run 2000
-
+force Input_Port 16#0000F320 
+run 10000
